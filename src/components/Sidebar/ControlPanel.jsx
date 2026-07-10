@@ -135,7 +135,8 @@ export default function ControlPanel({
   setBrandTheme,
   saveClient,
   loadClient,
-  TEMPLATE_DEFAULTS
+  TEMPLATE_DEFAULTS,
+  onOpenBrandManager
 }) {
   const { hero, fg, logo, grade, zones } = activeTpl;
   const { brandTheme, selectedZoneId } = state;
@@ -184,35 +185,13 @@ export default function ControlPanel({
                   ))}
                 </select>
               </div>
-              <div className="cp-row" style={{ gap: '8px' }}>
-                <input 
-                  type="text" 
-                  id="newClientName"
-                  placeholder="New client name..."
-                  className="cp-input-sm"
-                  style={{ flex: 1 }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      if (e.target.value.trim()) {
-                        saveClient(e.target.value.trim(), brandTheme);
-                        e.target.value = '';
-                      }
-                    }
-                  }}
-                />
-                <button 
-                  className="btn-sm" 
-                  onClick={() => {
-                    const input = document.getElementById('newClientName');
-                    if (input && input.value.trim()) {
-                      saveClient(input.value.trim(), brandTheme);
-                      input.value = '';
-                    }
-                  }}
-                >
-                  Save As
-                </button>
-              </div>
+              <button 
+                className="btn-sm" 
+                style={{ width: '100%', marginTop: '4px', padding: '8px' }}
+                onClick={onOpenBrandManager}
+              >
+                Manage Brands
+              </button>
             </div>
           )}
         </div>

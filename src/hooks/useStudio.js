@@ -49,6 +49,7 @@ const zoneDefaults = {
   verseSub:  { family: 'Montserrat', size: 15, weight: '500', italic: false, caps: true, color: '#F3F8F1', align: 'right', tracking: 8, shadow: 'soft', visible: true },
   artisan:   { family: 'Minal',  size: 80, weight: '400', italic: false, caps: false, color: '#F3F8F1', align: 'center', tracking: 1,  shadow: 'hard', visible: true },
   artSub:    { family: 'Cormorant Garamond', size: 30, weight: '300', italic: true, caps: false, color: '#F3F8F1', align: 'center', tracking: 1, shadow: 'hard', visible: true },
+  contactInfo: { family: 'Inter', size: 14, weight: '400', italic: false, caps: false, color: '#F3F8F1', align: 'left', tracking: 1, shadow: 'soft', visible: true },
 };
 
 // ─── Template Definitions ──────────────────────────────────────────
@@ -127,6 +128,19 @@ const TEMPLATE_DEFAULTS = [
       h2:       { type:'gold',      text:'Feast', align:'center', family: 'Cinzel', size: 60, tracking: 8 },
     }),
   },
+  // T7: Breakfast Bliss
+  {
+    id: 't7', label: 'Breakfast Bliss', icon: '🍳', category: 'Breakfast',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      eyebrow:  { type:'artSub', text:'tasty', align:'center', size: 60, color: '#fff', family: 'Playfair Display', tracking: 0, weight: '500' },
+      h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 90, tracking: -3, color: '#fff', shadow: 'soft' },
+      h2:       { type:'artSub', text:'joy', align:'center', size: 60, color: '#fff', family: 'Playfair Display', tracking: 0, weight: '500' },
+      tagline:  { type:'tagline', text:'Creamy eggs, toasted sourdough, simple perfection.', align: 'center', size: 16, color: '#fff', italic: false, family: 'Inter', weight: '300' },
+      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
+      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
+    }),
+  },
 ];
 
 // ─── Initial State Factory ─────────────────────────────────────────
@@ -141,6 +155,8 @@ function makeInitialState() {
         primaryColor: '#F3F8F1',
         secondaryColor: '#A28242',
         logoUrl: null,
+        phone: '+44 1234 567890',
+        location: 'Slough, Greater London'
       }
     },
     activeClient: 'East Eatery',
@@ -150,16 +166,20 @@ function makeInitialState() {
       primaryColor: '#F3F8F1',
       secondaryColor: '#A28242',
       logoUrl: null,
+      phone: '+44 1234 567890',
+      location: 'Slough, Greater London'
     },
     hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false },
     fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
     logo: { url: null, scale: 0.3, x: 50, y: 15 },
     grade: { preset: 'none', custom: '#15392D', intensity: 35, blendMode: 'multiply' },
     templates: TEMPLATE_DEFAULTS.map(t => {
-      // Set the generated hero image exclusively for T6 (Royal Feast)
+      // Set the generated hero image exclusively for T6 and T7
       let defaultHeroUrl = null;
       if (t.id === 't6') {
         defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686748408-royal_feast_hero.jpg?alt=media';
+      } else if (t.id === 't7') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783725626395-breakfast_hero.jpg?alt=media';
       }
 
       return {
@@ -194,15 +214,28 @@ function reducer(state, action) {
 
     case 'SET_BRAND_THEME': {
       const newTheme = { ...state.brandTheme, ...payload };
-      let updatedTemplates = state.templates;
-      
-      // If logoUrl was updated, propagate it to all templates
-      if (payload.logoUrl !== undefined) {
-        updatedTemplates = state.templates.map(t => ({
-          ...t,
-          logo: { ...t.logo, url: payload.logoUrl }
-        }));
-      }
+      let updatedTemplates = state.templates.map(t => {
+        let updatedZones = { ...t.zones };
+        let changed = false;
+        
+        if (payload.logoUrl !== undefined) {
+          t = { ...t, logo: { ...t.logo, url: payload.logoUrl } };
+          changed = true;
+        }
+        if (payload.phone !== undefined && updatedZones.phone) {
+          updatedZones.phone = { ...updatedZones.phone, text: payload.phone };
+          changed = true;
+        }
+        if (payload.location !== undefined && updatedZones.location) {
+          updatedZones.location = { ...updatedZones.location, text: payload.location };
+          changed = true;
+        }
+        
+        if (changed) {
+          return { ...t, zones: updatedZones };
+        }
+        return t;
+      });
       
       return { ...state, brandTheme: newTheme, templates: updatedTemplates };
     }
@@ -216,16 +249,35 @@ function reducer(state, action) {
       };
     }
 
+    case 'DELETE_CLIENT': {
+      const name = payload;
+      const newClients = { ...state.clients };
+      delete newClients[name];
+      const fallbackClient = Object.keys(newClients)[0] || null;
+      return {
+        ...state,
+        clients: newClients,
+        activeClient: state.activeClient === name ? fallbackClient : state.activeClient
+      };
+    }
+
     case 'LOAD_CLIENT': {
       const name = payload;
       const theme = state.clients[name];
       if (!theme) return state;
       
-      // Apply the client's logo to all templates
-      const updatedTemplates = state.templates.map(t => ({
-        ...t,
-        logo: { ...t.logo, url: theme.logoUrl }
-      }));
+      // Apply the client's logo and contact info to all templates
+      const updatedTemplates = state.templates.map(t => {
+        let updatedZones = { ...t.zones };
+        if (updatedZones.phone && theme.phone !== undefined) updatedZones.phone = { ...updatedZones.phone, text: theme.phone };
+        if (updatedZones.location && theme.location !== undefined) updatedZones.location = { ...updatedZones.location, text: theme.location };
+        
+        return {
+          ...t,
+          logo: { ...t.logo, url: theme.logoUrl },
+          zones: updatedZones
+        };
+      });
       
       return {
         ...state,
@@ -294,6 +346,9 @@ export function useStudio() {
   const saveClient = useCallback((name, theme) =>
     dispatch({ type: 'SAVE_CLIENT', payload: { name, theme } }), []);
 
+  const deleteClient = useCallback((name) =>
+    dispatch({ type: 'DELETE_CLIENT', payload: name }), []);
+
   const loadClient = useCallback((name) =>
     dispatch({ type: 'LOAD_CLIENT', payload: name }), []);
 
@@ -324,6 +379,7 @@ export function useStudio() {
     setSelectedZoneId,
     setBrandTheme,
     saveClient,
+    deleteClient,
     loadClient,
     setHero,
     setFg,

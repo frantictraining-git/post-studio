@@ -1,0 +1,232 @@
+.bm-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.bm-modal {
+  width: 700px;
+  max-width: 90vw;
+  height: 500px;
+  max-height: 90vh;
+  background: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bm-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bm-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.bm-close {
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.bm-close:hover {
+  color: #fff;
+}
+
+.bm-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.bm-sidebar {
+  width: 200px;
+  background: rgba(0, 0, 0, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bm-sidebar h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #888;
+  margin: 0 0 16px 0;
+}
+
+.bm-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.bm-list li {
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.bm-list li:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.bm-list li.active {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00f0ff;
+}
+
+.bm-btn-outline {
+  margin-top: 16px;
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: #ccc;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.bm-btn-outline:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+.bm-content {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.bm-field {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bm-field-row {
+  display: flex;
+  gap: 16px;
+}
+
+.bm-field-row .bm-field {
+  flex: 1;
+}
+
+.bm-field label {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.bm-field input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.bm-field input:focus {
+  border-color: #00f0ff;
+}
+
+.bm-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bm-btn-primary {
+  background: #00f0ff;
+  color: #000;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.bm-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.bm-btn-danger {
+  background: transparent;
+  color: #ff4757;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bm-btn-danger:hover:not(:disabled) {
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.bm-btn-danger:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.bm-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #666;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

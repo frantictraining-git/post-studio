@@ -6,6 +6,7 @@ import T3_AmbientMood from '../templates/T3_AmbientMood';
 import T4_FloatingVerse from '../templates/T4_FloatingVerse';
 import T5_ArtisanFrame from '../templates/T5_ArtisanFrame';
 import T6_RoyalFeast from '../templates/T6_RoyalFeast';
+import T7_BreakfastBliss from '../templates/T7_BreakfastBliss';
 import { exportToPNG } from '../../utils/canvasExport';
 
 const TEMPLATES = [
@@ -15,9 +16,10 @@ const TEMPLATES = [
   T4_FloatingVerse,
   T5_ArtisanFrame,
   T6_RoyalFeast,
+  T7_BreakfastBliss,
 ];
 
-const CATEGORIES = ['Minimal', 'Modern', 'Light', 'Dark', 'Gold', 'Green', 'Black'];
+const CATEGORIES = ['Minimal', 'Modern', 'Light', 'Dark', 'Gold', 'Green', 'Black', 'Breakfast'];
 
 export default function PreviewFrame({ state, activeTpl, setHero, setFg, setLogo, setActiveTemplate, setSelectedZoneId, setZoneText, TEMPLATE_DEFAULTS }) {
   const ActiveComponent = TEMPLATES[state.activeTemplate];

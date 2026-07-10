@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStudio } from './hooks/useStudio';
 import ControlPanel from './components/Sidebar/ControlPanel';
 import PreviewFrame from './components/Preview/PreviewFrame';
+import BrandManagerModal from './components/Sidebar/BrandManagerModal';
 import './App.css';
 
 function App() {
@@ -18,9 +19,12 @@ function App() {
     setSelectedZoneId,
     setBrandTheme,
     saveClient,
+    deleteClient,
     loadClient,
     TEMPLATE_DEFAULTS
   } = useStudio();
+
+  const [isBrandManagerOpen, setIsBrandManagerOpen] = useState(false);
 
   return (
     <div 
@@ -47,6 +51,7 @@ function App() {
         saveClient={saveClient}
         loadClient={loadClient}
         TEMPLATE_DEFAULTS={TEMPLATE_DEFAULTS}
+        onOpenBrandManager={() => setIsBrandManagerOpen(true)}
       />
       <PreviewFrame 
         state={state}
@@ -58,6 +63,14 @@ function App() {
         setSelectedZoneId={setSelectedZoneId}
         setZoneText={setZoneText}
         TEMPLATE_DEFAULTS={TEMPLATE_DEFAULTS}
+      />
+      <BrandManagerModal 
+        isOpen={isBrandManagerOpen}
+        onClose={() => setIsBrandManagerOpen(false)}
+        state={state}
+        saveClient={saveClient}
+        deleteClient={deleteClient}
+        loadClient={loadClient}
       />
     </div>
   );
