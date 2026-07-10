@@ -10,7 +10,12 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-*.local
+*.eslintcache
+.stylelintcache
+.prettiercache
+
+# Firebase Keys
+.firebase-admin-key.json
 
 # Editor directories and files
 .vscode/*

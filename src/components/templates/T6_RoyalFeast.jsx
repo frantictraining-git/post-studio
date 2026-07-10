@@ -12,7 +12,7 @@ export default function T6_RoyalFeast({ tpl, selectedZoneId, onSelectZone, onTex
       <div className="tpl-6-gradient" />
 
       {/* Gold Particles Overlay with screen blending */}
-      <img src="/gold-particles.jpg" className="tpl-6-particles" alt="" />
+      <img src="https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686525909-gold-particles.jpg?alt=media" className="tpl-6-particles" alt="" crossOrigin="anonymous" />
       
       {/* Main Text Content */}
       <div className="tpl-6-upper">
