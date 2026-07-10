@@ -155,14 +155,22 @@ function makeInitialState() {
     fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
     logo: { url: null, scale: 0.3, x: 50, y: 15 },
     grade: { preset: 'none', custom: '#15392D', intensity: 35, blendMode: 'multiply' },
-    templates: TEMPLATE_DEFAULTS.map(t => ({
-      ...t,
-      hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false },
-      fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
-      logo: { url: null, scale: 0.3, x: 50, y: 15 },
-      grade: { ...t.defaultGrade, blendMode: 'multiply', custom: '#15392D' },
-      zones: JSON.parse(JSON.stringify(t.zones)),
-    })),
+    templates: TEMPLATE_DEFAULTS.map(t => {
+      // Set the generated hero image exclusively for T6 (Royal Feast)
+      let defaultHeroUrl = null;
+      if (t.id === 't6') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686748408-royal_feast_hero.jpg?alt=media';
+      }
+
+      return {
+        ...t,
+        hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false },
+        fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
+        logo: { url: null, scale: 0.3, x: 50, y: 15 },
+        grade: { ...t.defaultGrade, blendMode: 'multiply', custom: '#15392D' },
+        zones: JSON.parse(JSON.stringify(t.zones)),
+      };
+    }),
   };
 }
 
