@@ -117,6 +117,16 @@ const TEMPLATE_DEFAULTS = [
       h2:       { type:'artSub',    text:'Taste with Love', size:34 },
     }),
   },
+  // T6: Royal Feast
+  {
+    id: 't6', label: 'Royal Feast', icon: '✨', category: 'Gold',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      pre:      { type:'goldSub',   text:'A', align:'center', size:36, family: 'Cormorant Garamond' },
+      h1:       { type:'gold',      text:'Royal', align:'center', family: 'Minal', size: 90, tracking: 0 },
+      h2:       { type:'gold',      text:'Feast', align:'center', family: 'Cinzel', size: 60, tracking: 8 },
+    }),
+  },
 ];
 
 // ─── Initial State Factory ─────────────────────────────────────────
