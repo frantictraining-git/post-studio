@@ -7,8 +7,10 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
   const [formData, setFormData] = useState({
     primaryFont: 'Minal',
     secondaryFont: 'Montserrat',
-    primaryColor: '#F3F8F1',
-    secondaryColor: '#A28242',
+    brandColor1: '#F3F8F1',
+    brandColor2: '#A28242',
+    brandColor3: '#000000',
+    brandColor4: '#FFFFFF',
     logoUrl: '',
     phone: '',
     location: ''
@@ -83,24 +85,25 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                 </li>
               ))}
             </ul>
-            <button 
-              className="bm-btn-outline" 
-              onClick={() => {
-                setEditingClient('New Brand');
-                setOriginalClientName('');
-                setFormData({
-                  primaryFont: 'Minal',
-                  secondaryFont: 'Montserrat',
-                  primaryColor: '#F3F8F1',
-                  secondaryColor: '#A28242',
-                  logoUrl: '',
-                  phone: '',
-                  location: ''
-                });
-              }}
-            >
-              + Add New Brand
-            </button>
+                <div className="bm-btn-outline" 
+                  onClick={() => {
+                    setEditingClient('New Brand');
+                    setOriginalClientName('');
+                    setFormData({
+                      primaryFont: 'Minal',
+                      secondaryFont: 'Montserrat',
+                      brandColor1: '#F3F8F1',
+                      brandColor2: '#A28242',
+                      brandColor3: '#000000',
+                      brandColor4: '#FFFFFF',
+                      logoUrl: '',
+                      phone: '',
+                      location: ''
+                    });
+                  }}
+                >
+                  + Add New Brand
+                </div>
           </div>
           
           <div className="bm-content">
@@ -135,13 +138,44 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                   </div>
                 </div>
                 <div className="bm-field">
-                  <label>Logo URL</label>
+                  <label>Logo URL (Default: Abstract Logo)</label>
                   <input 
                     type="text" 
                     value={formData.logoUrl || ''} 
                     onChange={e => setFormData({...formData, logoUrl: e.target.value})} 
                     placeholder="https://..."
                   />
+                </div>
+
+                <div className="bm-field-row">
+                  <div className="bm-field">
+                    <label>Primary Font</label>
+                    <select value={formData.primaryFont || 'Minal'} onChange={e => setFormData({...formData, primaryFont: e.target.value})}>
+                      <option value="Minal">Minal</option>
+                      <option value="Cinzel">Cinzel</option>
+                      <option value="Playfair Display">Playfair Display</option>
+                      <option value="Inter">Inter</option>
+                    </select>
+                  </div>
+                  <div className="bm-field">
+                    <label>Secondary Font</label>
+                    <select value={formData.secondaryFont || 'Montserrat'} onChange={e => setFormData({...formData, secondaryFont: e.target.value})}>
+                      <option value="Montserrat">Montserrat</option>
+                      <option value="Cormorant Garamond">Cormorant Garamond</option>
+                      <option value="Great Vibes">Great Vibes</option>
+                      <option value="Inter">Inter</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="bm-field">
+                  <label>Brand Colors</label>
+                  <div className="bm-colors">
+                    <input type="color" value={formData.brandColor1 || '#F3F8F1'} onChange={e => setFormData({...formData, brandColor1: e.target.value})} title="Color 1" />
+                    <input type="color" value={formData.brandColor2 || '#A28242'} onChange={e => setFormData({...formData, brandColor2: e.target.value})} title="Color 2" />
+                    <input type="color" value={formData.brandColor3 || '#000000'} onChange={e => setFormData({...formData, brandColor3: e.target.value})} title="Color 3" />
+                    <input type="color" value={formData.brandColor4 || '#FFFFFF'} onChange={e => setFormData({...formData, brandColor4: e.target.value})} title="Color 4" />
+                  </div>
                 </div>
                 
                 <div className="bm-actions">

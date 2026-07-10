@@ -141,6 +141,44 @@ const TEMPLATE_DEFAULTS = [
       location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
     }),
   },
+  // T8: Brunch Bliss
+  {
+    id: 't8', label: 'Brunch Bliss', icon: '🥞', category: 'Breakfast',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      h2:       { type:'artSub', text:'golden', align:'center', size: 60, color: '#A28242', family: 'Great Vibes', tracking: 0, weight: '400' },
+      h1:       { type:'h1', text:'BRUNCH', align:'center', family: 'Inter', weight: '900', caps: true, size: 100, tracking: -2, color: '#F3F8F1', shadow: 'soft' },
+      h3:       { type:'artSub', text:'bliss', align:'center', size: 60, color: '#A28242', family: 'Great Vibes', tracking: 0, weight: '400' },
+      tagline:  { type:'tagline', text:'Golden pancakes, drizzled with honey butter love.', align: 'left', size: 14, color: '#fff', italic: false, family: 'Inter', weight: '300' },
+      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
+      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
+    }),
+  },
+  // T9: Morning Mood
+  {
+    id: 't9', label: 'Morning Mood', icon: '🍓', category: 'Breakfast',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 120, tracking: -5, color: '#E53935', shadow: 'hard' },
+      tagline:  { type:'h1', text:'FLIP YOUR MOOD', align:'center', family: 'Inter', weight: '300', caps: true, size: 24, tracking: 8, color: '#FFCA28', shadow: 'soft' },
+      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
+      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
+    }),
+  },
+  // T10: Perfect Harmony
+  {
+    id: 't10', label: 'Perfect Harmony', icon: '🍽️', category: 'Modern',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      eyebrow:  { type:'tagline', text:'YOUR PRESENTS', align:'center', family: 'Inter', weight: '300', caps: true, size: 14, tracking: 4, color: '#fff' },
+      h2:       { type:'artSub', text:'Perfect', align:'center', size: 70, color: '#A28242', family: 'Great Vibes', tracking: 0, weight: '400' },
+      h1:       { type:'h1', text:'HARMONY', align:'center', family: 'Minal', weight: '400', caps: true, size: 80, tracking: 2, color: '#F3F8F1', shadow: 'soft' },
+      tagline:  { type:'tagline', text:'From the first bite to the final note, our cuisine balances texture, aroma, and taste.', align: 'center', size: 12, color: '#fff', italic: false, family: 'Inter', weight: '300' },
+      website:  { type:'tagline', text:'WWW.EXAMPLE.COM', align: 'center', size: 12, color: '#fff', family: 'Inter', weight: '600', tracking: 4 },
+      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'center' },
+      location: { type:'contactInfo', text:'Slough, Greater London', align: 'center' }
+    }),
+  },
 ];
 
 // ─── Initial State Factory ─────────────────────────────────────────
@@ -152,9 +190,11 @@ function makeInitialState() {
       'East Eatery': {
         primaryFont: 'Minal',
         secondaryFont: 'Montserrat',
-        primaryColor: '#F3F8F1',
-        secondaryColor: '#A28242',
-        logoUrl: null,
+        brandColor1: '#F3F8F1',
+        brandColor2: '#A28242',
+        brandColor3: '#000000',
+        brandColor4: '#FFFFFF',
+        logoUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
         phone: '+44 1234 567890',
         location: 'Slough, Greater London'
       }
@@ -163,9 +203,11 @@ function makeInitialState() {
     brandTheme: {
       primaryFont: 'Minal',
       secondaryFont: 'Montserrat',
-      primaryColor: '#F3F8F1',
-      secondaryColor: '#A28242',
-      logoUrl: null,
+      brandColor1: '#F3F8F1',
+      brandColor2: '#A28242',
+      brandColor3: '#000000',
+      brandColor4: '#FFFFFF',
+      logoUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
       phone: '+44 1234 567890',
       location: 'Slough, Greater London'
     },
@@ -268,13 +310,26 @@ function reducer(state, action) {
       
       // Apply the client's logo and contact info to all templates
       const updatedTemplates = state.templates.map(t => {
+        let defaultHeroUrl = null;
+        if (t.id === 't6') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686748408-royal_feast_hero.jpg?alt=media';
+        } else if (t.id === 't7') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783725626395-breakfast_hero.jpg?alt=media';
+        } else if (t.id === 't8') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726769651-t8_hero.jpg?alt=media';
+        } else if (t.id === 't9') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726771663-t9_hero.jpg?alt=media';
+        } else if (t.id === 't10') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726774242-t10_hero.jpg?alt=media';
+        }
         let updatedZones = { ...t.zones };
         if (updatedZones.phone && theme.phone !== undefined) updatedZones.phone = { ...updatedZones.phone, text: theme.phone };
         if (updatedZones.location && theme.location !== undefined) updatedZones.location = { ...updatedZones.location, text: theme.location };
         
         return {
           ...t,
-          logo: { ...t.logo, url: theme.logoUrl },
+          logo: { ...t.logo, url: theme.logoUrl || 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media' },
+          hero: { ...t.hero, url: defaultHeroUrl },
           zones: updatedZones
         };
       });

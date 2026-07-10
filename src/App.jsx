@@ -32,8 +32,10 @@ function App() {
       style={{
         '--brand-primary': `"${state.brandTheme.primaryFont}", sans-serif`,
         '--brand-secondary': `"${state.brandTheme.secondaryFont}", sans-serif`,
-        '--brand-color-1': state.brandTheme.primaryColor,
-        '--brand-color-2': state.brandTheme.secondaryColor,
+        '--brand-color-1': state.brandTheme.brandColor1,
+        '--brand-color-2': state.brandTheme.brandColor2,
+        '--brand-color-3': state.brandTheme.brandColor3,
+        '--brand-color-4': state.brandTheme.brandColor4,
       }}
     >
       <ControlPanel 

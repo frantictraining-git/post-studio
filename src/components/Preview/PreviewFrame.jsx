@@ -7,6 +7,9 @@ import T4_FloatingVerse from '../templates/T4_FloatingVerse';
 import T5_ArtisanFrame from '../templates/T5_ArtisanFrame';
 import T6_RoyalFeast from '../templates/T6_RoyalFeast';
 import T7_BreakfastBliss from '../templates/T7_BreakfastBliss';
+import T8_BrunchBliss from '../templates/T8_BrunchBliss';
+import T9_MorningMood from '../templates/T9_MorningMood';
+import T10_PerfectHarmony from '../templates/T10_PerfectHarmony';
 import { exportToPNG } from '../../utils/canvasExport';
 
 const TEMPLATES = [
@@ -17,6 +20,9 @@ const TEMPLATES = [
   T5_ArtisanFrame,
   T6_RoyalFeast,
   T7_BreakfastBliss,
+  T8_BrunchBliss,
+  T9_MorningMood,
+  T10_PerfectHarmony,
 ];
 
 const CATEGORIES = ['Minimal', 'Modern', 'Light', 'Dark', 'Gold', 'Green', 'Black', 'Breakfast'];
