@@ -1,0 +1,260 @@
+/* ═══════════════════════════════════════════════════════
+   EAST EATERY — POST STUDIO DESIGN SYSTEM
+   "The Affordable Luxury Dining"
+═══════════════════════════════════════════════════════ */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Custom font: Minal (drop your Minal.woff2 into /public/fonts/) */
+@font-face {
+  font-family: 'Minal';
+  src: url('/fonts/Minal.otf') format('opentype'),
+       url('/fonts/Minal.woff2') format('woff2'),
+       url('/fonts/Minal.woff') format('woff'),
+       url('/fonts/Minal.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Custom font: Montserrat (Local Variable Fonts) */
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/fonts/Montserrat-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BRAND TOKENS
+═══════════════════════════════════════════════════════ */
+:root {
+  /* Green palette */
+  --brand-green:        #15392D;
+  --brand-green-dark:   #293926;
+  --brand-green-mid-dk: #2B562A;
+  --brand-green-mid:    #4B7350;
+  --brand-mint:         #95CAB6;
+  --brand-offwhite:     #F3F8F1;
+
+  /* Gold palette */
+  --brand-gold:         #564020;
+  --brand-gold-dark:    #73613C;
+  --brand-gold-med:     #A28242;
+  --brand-gold-light:   #AF9B78;
+
+  /* Font stacks */
+  --font-display:  'Minal', 'Cormorant Garamond', 'Playfair Display', serif;
+  --font-heading:  'Montserrat', sans-serif;
+  --font-ui:       'Poppins', sans-serif;
+  --font-body:     'Montserrat', sans-serif;
+
+  /* Studio UI tokens */
+  --ui-bg:          #0c0f0d;
+  --ui-panel:       #111612;
+  --ui-panel-2:     #161c16;
+  --ui-panel-3:     #1c2420;
+  --ui-border:      rgba(149, 202, 182, 0.08);
+  --ui-border-gold: rgba(162, 130, 66, 0.25);
+  --ui-text:        #e8ede8;
+  --ui-text-muted:  #7a9080;
+  --ui-accent:      var(--brand-gold-med);
+  --ui-accent-glow: rgba(162, 130, 66, 0.25);
+  --ui-radius:      8px;
+  --ui-transition:  0.18s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ui-border-gold); border-radius: 2px; }
+* { scrollbar-width: thin; scrollbar-color: var(--ui-border-gold) transparent; }
+
+/* ═══════════════════════════════════════════════════════
+   SHARED CONTROL ATOMS
+═══════════════════════════════════════════════════════ */
+
+/* Range slider */
+input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  background: var(--ui-panel-3);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--brand-gold-med);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--ui-accent-glow);
+  transition: transform 0.15s;
+}
+input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
+input[type='range']::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border: none; border-radius: 50%;
+  background: var(--brand-gold-med);
+  cursor: pointer;
+}
+
+/* Select */
+select {
+  width: 100%;
+  padding: 7px 28px 7px 10px;
+  background: var(--ui-panel-3);
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  color: var(--ui-text);
+  font-size: 11px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  outline: none;
+  transition: var(--ui-transition);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%237a9080' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+select:focus { border-color: var(--ui-border-gold); outline: none; }
+
+/* Text inputs / textarea */
+input[type='text'],
+input[type='url'],
+textarea {
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--ui-panel-3);
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  color: var(--ui-text);
+  font-size: 12px;
+  font-family: var(--font-ui);
+  outline: none;
+  transition: var(--ui-transition);
+  resize: vertical;
+}
+input[type='text']:focus,
+input[type='url']:focus,
+textarea:focus { border-color: var(--ui-border-gold); }
+textarea { min-height: 40px; }
+
+/* Color input */
+input[type='color'] {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--ui-border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+/* Checkbox / Toggle */
+.toggle {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--ui-panel-3);
+  border: 1px solid var(--ui-border);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.toggle-track::before {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  left: 2px; top: 2px;
+  background: var(--ui-text-muted);
+  border-radius: 50%;
+  transition: 0.2s;
+}
+.toggle input:checked ~ .toggle-track {
+  background: rgba(162, 130, 66, 0.2);
+  border-color: var(--brand-gold-med);
+}
+.toggle input:checked ~ .toggle-track::before {
+  transform: translateX(16px);
+  background: var(--brand-gold-med);
+}
+
+/* Button group */
+.btn-group {
+  display: flex;
+  gap: 4px;
+}
+.btn-sm {
+  flex: 1;
+  padding: 6px 6px;
+  background: var(--ui-panel-3);
+  border: 1px solid var(--ui-border);
+  border-radius: 5px;
+  color: var(--ui-text-muted);
+  font-size: 10px;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: var(--ui-transition);
+  text-align: center;
+  white-space: nowrap;
+}
+.btn-sm:hover { border-color: var(--ui-border-gold); color: var(--ui-text); }
+.btn-sm.active {
+  background: rgba(162, 130, 66, 0.12);
+  border-color: var(--brand-gold-med);
+  color: var(--brand-gold-med);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

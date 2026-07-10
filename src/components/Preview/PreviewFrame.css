@@ -1,0 +1,176 @@
+.pv-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--ui-bg);
+  height: 100vh;
+}
+
+.pv-toolbar {
+  padding: 16px 24px;
+  background: var(--ui-panel-2);
+  border-bottom: 1px solid var(--ui-border);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pv-toolbar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pv-categories {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.pv-cat-btn {
+  background: transparent;
+  border: 1px solid var(--ui-border);
+  border-radius: 16px;
+  color: var(--ui-text-muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.pv-cat-btn:hover {
+  border-color: var(--ui-text-muted);
+  color: var(--ui-text);
+}
+.pv-cat-btn.active {
+  background: var(--ui-text);
+  color: var(--ui-bg);
+  border-color: var(--ui-text);
+}
+
+.pv-templates-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.pv-tpl-mini-btn {
+  background: var(--ui-panel-3);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--ui-text-muted);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.pv-tpl-mini-btn:hover {
+  border-color: var(--ui-border-gold);
+  color: var(--ui-text);
+}
+.pv-tpl-mini-btn.active {
+  background: rgba(162, 130, 66, 0.1);
+  border-color: var(--brand-gold-med);
+  color: var(--brand-gold-med);
+}
+.pv-tpl-icon {
+  font-size: 14px;
+}
+.pv-templates-empty {
+  font-size: 12px;
+  color: var(--ui-text-muted);
+  font-style: italic;
+  padding: 8px 0;
+}
+
+.pv-tabs {
+  display: flex;
+  gap: 16px;
+}
+.pv-tab {
+  background: transparent;
+  border: none;
+  color: var(--ui-text-muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 0;
+  position: relative;
+}
+.pv-tab.active {
+  color: var(--brand-gold-med);
+}
+.pv-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--brand-gold-med);
+  border-radius: 2px;
+}
+
+.pv-export-btn {
+  background: var(--brand-gold-med);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(162, 130, 66, 0.2);
+}
+.pv-export-btn:hover:not(:disabled) {
+  background: #b59451;
+  transform: translateY(-1px);
+}
+.pv-export-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.pv-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(45deg, var(--ui-panel) 25%, transparent 25%), 
+    linear-gradient(-45deg, var(--ui-panel) 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, var(--ui-panel) 75%), 
+    linear-gradient(-45deg, transparent 75%, var(--ui-panel) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.pv-frame {
+  width: 432px;
+  height: 540px;
+  background: #000;
+  position: relative;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.05);
+  overflow: hidden;
+  user-select: none;
+  transform: scale(1.25);
+  transform-origin: center center;
+  margin: 60px 0; /* Add margin so it doesn't overlap when scaled */
+}
+
+.pv-hint {
+  margin-top: 24px;
+  font-size: 12px;
+  color: var(--ui-text-muted);
+}
