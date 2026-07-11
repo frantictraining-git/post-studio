@@ -1,5 +1,5 @@
 // Central state hook for the Post Studio
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useEffect } from 'react';
 
 // ─── Brand Defaults ───────────────────────────────────────────────
 export const BRAND = {
@@ -234,23 +234,46 @@ const TEMPLATE_DEFAULTS = [
 
 // ─── Initial State Factory ─────────────────────────────────────────
 function makeInitialState() {
+  const savedData = localStorage.getItem('postStudioClients');
+  let clients = {
+    'East Eatery': {
+      primaryFont: 'Minal',
+      secondaryFont: 'Montserrat',
+      primaryColor1: '#F3F8F1',
+      primaryColor2: '#A28242',
+      primaryColor3: '#000000',
+      secondaryColor1: '#FFFFFF',
+      secondaryColor2: '#DDDDDD',
+      secondaryColor3: '#999999',
+      logoUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
+      phone: '+44 1234 567890',
+      email: 'hello@brand.com',
+      webAddress: 'www.brand.com',
+      insta: '@brand',
+      facebook: '',
+      youtube: '',
+      tiktok: '',
+      tagline: 'Your daily dose of inspiration',
+      location: 'Slough, Greater London'
+    }
+  };
+  let activeClient = 'East Eatery';
+
+  if (savedData) {
+    try {
+      const parsed = JSON.parse(savedData);
+      if (parsed && parsed.clients) clients = parsed.clients;
+      if (parsed && parsed.activeClient) activeClient = parsed.activeClient;
+    } catch (e) {
+      console.error("Could not parse saved clients", e);
+    }
+  }
+
   return {
     activeTemplate: 0,
     selectedZoneId: null,
-    clients: {
-      'East Eatery': {
-        primaryFont: 'Minal',
-        secondaryFont: 'Montserrat',
-        brandColor1: '#F3F8F1',
-        brandColor2: '#A28242',
-        brandColor3: '#000000',
-        brandColor4: '#FFFFFF',
-        logoUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
-        phone: '+44 1234 567890',
-        location: 'Slough, Greater London'
-      }
-    },
-    activeClient: 'East Eatery',
+    clients,
+    activeClient,
     brandTheme: {
       primaryFont: 'Minal',
       secondaryFont: 'Montserrat',
@@ -514,6 +537,13 @@ function reducer(state, action) {
 // ─── Hook ──────────────────────────────────────────────────────────
 export function useStudio() {
   const [state, dispatch] = useReducer(reducer, null, makeInitialState);
+
+  useEffect(() => {
+    localStorage.setItem('postStudioClients', JSON.stringify({
+      clients: state.clients,
+      activeClient: state.activeClient
+    }));
+  }, [state.clients, state.activeClient]);
 
   const setActiveTemplate = useCallback((idx) =>
     dispatch({ type: 'SET_ACTIVE_TEMPLATE', payload: idx }), []);
