@@ -197,37 +197,7 @@ export default function ControlPanel({
           )}
         </div>
         
-        {/* Global Brand Settings */}
-        <div className="cp-section">
-          <h2 className="cp-section-title">Global Brand Theme</h2>
-          <div className="cp-row" style={{ marginBottom: 8 }}>
-            <label className="cp-label" style={{ width: 100 }}>Primary Font</label>
-            <select 
-              value={brandTheme.primaryFont} 
-              onChange={(e) => setBrandTheme({ primaryFont: e.target.value })}
-              style={{ flex: 1 }}
-            >
-              {FONT_OPTIONS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-            </select>
-          </div>
-          <div className="cp-row" style={{ marginBottom: 12 }}>
-            <label className="cp-label" style={{ width: 100 }}>Secondary Font</label>
-            <select 
-              value={brandTheme.secondaryFont} 
-              onChange={(e) => setBrandTheme({ secondaryFont: e.target.value })}
-              style={{ flex: 1 }}
-            >
-              {FONT_OPTIONS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-            </select>
-          </div>
-          
-          <ImageUpload 
-            label="Global Brand Logo" 
-            hasImage={!!brandTheme.logoUrl}
-            onUpload={(url) => setBrandTheme({ logoUrl: url })}
-            onClear={() => setBrandTheme({ logoUrl: null })}
-          />
-        </div>
+
         
         {/* Background / Hero */}
         <div className="cp-section">

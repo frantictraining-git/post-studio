@@ -30,12 +30,20 @@ function App() {
     <div 
       className="app-container"
       style={{
-        '--brand-primary': `"${state.brandTheme.primaryFont}", sans-serif`,
-        '--brand-secondary': `"${state.brandTheme.secondaryFont}", sans-serif`,
-        '--brand-color-1': state.brandTheme.brandColor1,
-        '--brand-color-2': state.brandTheme.brandColor2,
-        '--brand-color-3': state.brandTheme.brandColor3,
-        '--brand-color-4': state.brandTheme.brandColor4,
+        '--brand-primary': `"${state.brandTheme.primaryFont || 'Minal'}", sans-serif`,
+        '--brand-secondary': `"${state.brandTheme.secondaryFont || 'Montserrat'}", sans-serif`,
+        // Backwards compatibility
+        '--brand-color-1': state.brandTheme.brandColor1 || state.brandTheme.primaryColor1 || '#F3F8F1',
+        '--brand-color-2': state.brandTheme.brandColor2 || state.brandTheme.primaryColor2 || '#A28242',
+        '--brand-color-3': state.brandTheme.brandColor3 || state.brandTheme.primaryColor3 || '#000000',
+        '--brand-color-4': state.brandTheme.brandColor4 || state.brandTheme.secondaryColor1 || '#FFFFFF',
+        // New 6 color system
+        '--primary-color-1': state.brandTheme.primaryColor1 || state.brandTheme.brandColor1 || '#F3F8F1',
+        '--primary-color-2': state.brandTheme.primaryColor2 || state.brandTheme.brandColor2 || '#A28242',
+        '--primary-color-3': state.brandTheme.primaryColor3 || state.brandTheme.brandColor3 || '#000000',
+        '--secondary-color-1': state.brandTheme.secondaryColor1 || state.brandTheme.brandColor4 || '#FFFFFF',
+        '--secondary-color-2': state.brandTheme.secondaryColor2 || '#DDDDDD',
+        '--secondary-color-3': state.brandTheme.secondaryColor3 || '#999999',
       }}
     >
       <ControlPanel 

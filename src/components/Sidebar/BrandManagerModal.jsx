@@ -1,20 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import './BrandManagerModal.css';
 
+const DEFAULT_FORM_DATA = {
+  primaryFont: 'Minal',
+  secondaryFont: 'Montserrat',
+  primaryColor1: '#F3F8F1',
+  primaryColor2: '#A28242',
+  primaryColor3: '#000000',
+  secondaryColor1: '#FFFFFF',
+  secondaryColor2: '#DDDDDD',
+  secondaryColor3: '#999999',
+  logoUrl: '',
+  location: '',
+  insta: '',
+  tagline: '',
+  webAddress: '',
+  email: ''
+};
+
 export default function BrandManagerModal({ isOpen, onClose, state, saveClient, deleteClient, loadClient }) {
   const [editingClient, setEditingClient] = useState('');
   const [originalClientName, setOriginalClientName] = useState('');
-  const [formData, setFormData] = useState({
-    primaryFont: 'Minal',
-    secondaryFont: 'Montserrat',
-    brandColor1: '#F3F8F1',
-    brandColor2: '#A28242',
-    brandColor3: '#000000',
-    brandColor4: '#FFFFFF',
-    logoUrl: '',
-    phone: '',
-    location: ''
-  });
+  const [formData, setFormData] = useState({ ...DEFAULT_FORM_DATA });
 
   // When modal opens, default to active client
   useEffect(() => {
@@ -26,10 +33,25 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
   if (!isOpen) return null;
 
   const handleSelectClient = (name) => {
+    const clientData = state.clients[name];
     setEditingClient(name);
     setOriginalClientName(name);
     setFormData({
-      ...state.clients[name]
+      primaryFont: clientData.primaryFont || 'Minal',
+      secondaryFont: clientData.secondaryFont || 'Montserrat',
+      // Map old brandColor fields if they exist to the new primary/secondary structure
+      primaryColor1: clientData.primaryColor1 || clientData.brandColor1 || '#F3F8F1',
+      primaryColor2: clientData.primaryColor2 || clientData.brandColor2 || '#A28242',
+      primaryColor3: clientData.primaryColor3 || clientData.brandColor3 || '#000000',
+      secondaryColor1: clientData.secondaryColor1 || clientData.brandColor4 || '#FFFFFF',
+      secondaryColor2: clientData.secondaryColor2 || '#DDDDDD',
+      secondaryColor3: clientData.secondaryColor3 || '#999999',
+      logoUrl: clientData.logoUrl || '',
+      location: clientData.location || '',
+      insta: clientData.insta || '',
+      tagline: clientData.tagline || '',
+      webAddress: clientData.webAddress || '',
+      email: clientData.email || ''
     });
   };
 
@@ -41,7 +63,16 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
       deleteClient(originalClientName);
     }
     
-    saveClient(editingClient, formData);
+    // Convert to backwards compatible colors just in case some templates still expect brandColorX
+    const mergedData = {
+      ...formData,
+      brandColor1: formData.primaryColor1,
+      brandColor2: formData.primaryColor2,
+      brandColor3: formData.primaryColor3,
+      brandColor4: formData.secondaryColor1
+    };
+
+    saveClient(editingClient, mergedData);
     setOriginalClientName(editingClient);
     
     // Auto-load if it's the active one or if they just created it
@@ -89,17 +120,7 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                   onClick={() => {
                     setEditingClient('New Brand');
                     setOriginalClientName('');
-                    setFormData({
-                      primaryFont: 'Minal',
-                      secondaryFont: 'Montserrat',
-                      brandColor1: '#F3F8F1',
-                      brandColor2: '#A28242',
-                      brandColor3: '#000000',
-                      brandColor4: '#FFFFFF',
-                      logoUrl: '',
-                      phone: '',
-                      location: ''
-                    });
+                    setFormData({ ...DEFAULT_FORM_DATA });
                   }}
                 >
                   + Add New Brand
@@ -110,38 +131,76 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
             {editingClient ? (
               <>
                 <div className="bm-field">
-                  <label>Brand Name</label>
+                  <label>Brand Name <span style={{color: '#ff4444'}}>*</span></label>
                   <input 
                     type="text" 
                     value={editingClient} 
                     onChange={e => setEditingClient(e.target.value)} 
+                    placeholder="e.g. East Eatery"
                   />
                 </div>
+                
+                <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '16px', color: '#fff', borderBottom: '1px solid #333', paddingBottom: '8px' }}>Contact & Social</h3>
+                
                 <div className="bm-field-row">
                   <div className="bm-field">
-                    <label>Phone Number</label>
+                    <label>Email Address</label>
+                    <input 
+                      type="email" 
+                      value={formData.email} 
+                      onChange={e => setFormData({...formData, email: e.target.value})} 
+                      placeholder="hello@brand.com"
+                    />
+                  </div>
+                  <div className="bm-field">
+                    <label>Web Address</label>
                     <input 
                       type="text" 
-                      value={formData.phone || ''} 
-                      onChange={e => setFormData({...formData, phone: e.target.value})} 
-                      placeholder="+44 1234 567890"
+                      value={formData.webAddress} 
+                      onChange={e => setFormData({...formData, webAddress: e.target.value})} 
+                      placeholder="www.brand.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="bm-field-row">
+                  <div className="bm-field">
+                    <label>Insta Handle</label>
+                    <input 
+                      type="text" 
+                      value={formData.insta} 
+                      onChange={e => setFormData({...formData, insta: e.target.value})} 
+                      placeholder="@brandname"
                     />
                   </div>
                   <div className="bm-field">
                     <label>Location</label>
                     <input 
                       type="text" 
-                      value={formData.location || ''} 
+                      value={formData.location} 
                       onChange={e => setFormData({...formData, location: e.target.value})} 
                       placeholder="London, UK"
                     />
                   </div>
                 </div>
+                
+                <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '16px', color: '#fff', borderBottom: '1px solid #333', paddingBottom: '8px' }}>Brand Identity</h3>
+
                 <div className="bm-field">
-                  <label>Logo URL (Default: Abstract Logo)</label>
+                  <label>Tagline</label>
                   <input 
                     type="text" 
-                    value={formData.logoUrl || ''} 
+                    value={formData.tagline} 
+                    onChange={e => setFormData({...formData, tagline: e.target.value})} 
+                    placeholder="Your daily dose of inspiration"
+                  />
+                </div>
+
+                <div className="bm-field">
+                  <label>Logo URL</label>
+                  <input 
+                    type="text" 
+                    value={formData.logoUrl} 
                     onChange={e => setFormData({...formData, logoUrl: e.target.value})} 
                     placeholder="https://..."
                   />
@@ -150,7 +209,7 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                 <div className="bm-field-row">
                   <div className="bm-field">
                     <label>Primary Font</label>
-                    <select value={formData.primaryFont || 'Minal'} onChange={e => setFormData({...formData, primaryFont: e.target.value})}>
+                    <select value={formData.primaryFont} onChange={e => setFormData({...formData, primaryFont: e.target.value})}>
                       <option value="Minal">Minal</option>
                       <option value="Cinzel">Cinzel</option>
                       <option value="Playfair Display">Playfair Display</option>
@@ -159,7 +218,7 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                   </div>
                   <div className="bm-field">
                     <label>Secondary Font</label>
-                    <select value={formData.secondaryFont || 'Montserrat'} onChange={e => setFormData({...formData, secondaryFont: e.target.value})}>
+                    <select value={formData.secondaryFont} onChange={e => setFormData({...formData, secondaryFont: e.target.value})}>
                       <option value="Montserrat">Montserrat</option>
                       <option value="Cormorant Garamond">Cormorant Garamond</option>
                       <option value="Great Vibes">Great Vibes</option>
@@ -168,19 +227,29 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                   </div>
                 </div>
 
+                <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '16px', color: '#fff', borderBottom: '1px solid #333', paddingBottom: '8px' }}>Brand Colors</h3>
+
                 <div className="bm-field">
-                  <label>Brand Colors</label>
+                  <label>3 Primary Colors</label>
                   <div className="bm-colors">
-                    <input type="color" value={formData.brandColor1 || '#F3F8F1'} onChange={e => setFormData({...formData, brandColor1: e.target.value})} title="Color 1" />
-                    <input type="color" value={formData.brandColor2 || '#A28242'} onChange={e => setFormData({...formData, brandColor2: e.target.value})} title="Color 2" />
-                    <input type="color" value={formData.brandColor3 || '#000000'} onChange={e => setFormData({...formData, brandColor3: e.target.value})} title="Color 3" />
-                    <input type="color" value={formData.brandColor4 || '#FFFFFF'} onChange={e => setFormData({...formData, brandColor4: e.target.value})} title="Color 4" />
+                    <input type="color" value={formData.primaryColor1} onChange={e => setFormData({...formData, primaryColor1: e.target.value})} title="Primary 1" />
+                    <input type="color" value={formData.primaryColor2} onChange={e => setFormData({...formData, primaryColor2: e.target.value})} title="Primary 2" />
+                    <input type="color" value={formData.primaryColor3} onChange={e => setFormData({...formData, primaryColor3: e.target.value})} title="Primary 3" />
+                  </div>
+                </div>
+
+                <div className="bm-field">
+                  <label>3 Secondary Colors</label>
+                  <div className="bm-colors">
+                    <input type="color" value={formData.secondaryColor1} onChange={e => setFormData({...formData, secondaryColor1: e.target.value})} title="Secondary 1" />
+                    <input type="color" value={formData.secondaryColor2} onChange={e => setFormData({...formData, secondaryColor2: e.target.value})} title="Secondary 2" />
+                    <input type="color" value={formData.secondaryColor3} onChange={e => setFormData({...formData, secondaryColor3: e.target.value})} title="Secondary 3" />
                   </div>
                 </div>
                 
-                <div className="bm-actions">
+                <div className="bm-actions" style={{ marginTop: '30px' }}>
                   <button className="bm-btn-danger" onClick={handleDelete} disabled={!originalClientName}>Delete</button>
-                  <button className="bm-btn-primary" onClick={handleSave}>Save Brand</button>
+                  <button className="bm-btn-primary" onClick={handleSave} disabled={!editingClient.trim()}>Save Brand</button>
                 </div>
               </>
             ) : (

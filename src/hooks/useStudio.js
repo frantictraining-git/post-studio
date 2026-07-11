@@ -254,12 +254,18 @@ function makeInitialState() {
     brandTheme: {
       primaryFont: 'Minal',
       secondaryFont: 'Montserrat',
-      brandColor1: '#F3F8F1',
-      brandColor2: '#A28242',
-      brandColor3: '#000000',
-      brandColor4: '#FFFFFF',
+      primaryColor1: '#F3F8F1',
+      primaryColor2: '#A28242',
+      primaryColor3: '#000000',
+      secondaryColor1: '#FFFFFF',
+      secondaryColor2: '#DDDDDD',
+      secondaryColor3: '#999999',
       logoUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
       phone: '+44 1234 567890',
+      email: 'hello@brand.com',
+      webAddress: 'www.brand.com',
+      insta: '@brand',
+      tagline: 'Your daily dose of inspiration',
       location: 'Slough, Greater London'
     },
     hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false },
@@ -396,9 +402,44 @@ function reducer(state, action) {
           defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727631759-t14_hero.jpg?alt=media';
         }
         let updatedZones = { ...t.zones };
-        if (updatedZones.phone && theme.phone !== undefined) updatedZones.phone = { ...updatedZones.phone, text: theme.phone };
-        if (updatedZones.location && theme.location !== undefined) updatedZones.location = { ...updatedZones.location, text: theme.location };
         
+        // Map contact info
+        if (updatedZones.phone) {
+          updatedZones.phone = { ...updatedZones.phone, text: theme.email || theme.phone || '' };
+        }
+        if (updatedZones.contact) {
+          updatedZones.contact = { ...updatedZones.contact, text: theme.email || theme.phone || '' };
+        }
+        
+        // Map location
+        if (updatedZones.location) {
+          updatedZones.location = { ...updatedZones.location, text: theme.location || '' };
+        }
+        if (updatedZones.address) {
+          updatedZones.address = { ...updatedZones.address, text: theme.location || '' };
+        }
+        
+        // Map webAddress
+        if (updatedZones.website) {
+          updatedZones.website = { ...updatedZones.website, text: theme.webAddress || '' };
+        }
+        
+        // Map tagline
+        if (updatedZones.tagline) {
+          updatedZones.tagline = { ...updatedZones.tagline, text: theme.tagline || '' };
+        }
+        if (updatedZones.subtitle) {
+          updatedZones.subtitle = { ...updatedZones.subtitle, text: theme.tagline || '' };
+        }
+        
+        // Map insta handle
+        if (updatedZones.social) {
+          updatedZones.social = { ...updatedZones.social, text: theme.insta || '' };
+        }
+        if (updatedZones.instagram) {
+          updatedZones.instagram = { ...updatedZones.instagram, text: theme.insta || '' };
+        }
+
         return {
           ...t,
           logo: { ...t.logo, url: theme.logoUrl || 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media' },
