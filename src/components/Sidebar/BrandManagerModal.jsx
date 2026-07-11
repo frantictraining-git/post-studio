@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './BrandManagerModal.css';
+import { storage } from '../../firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 const DEFAULT_FORM_DATA = {
   primaryFont: 'Minal',
@@ -13,6 +15,9 @@ const DEFAULT_FORM_DATA = {
   logoUrl: '',
   location: '',
   insta: '',
+  facebook: '',
+  youtube: '',
+  tiktok: '',
   tagline: '',
   webAddress: '',
   email: ''
@@ -22,6 +27,8 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
   const [editingClient, setEditingClient] = useState('');
   const [originalClientName, setOriginalClientName] = useState('');
   const [formData, setFormData] = useState({ ...DEFAULT_FORM_DATA });
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // When modal opens, default to active client
   useEffect(() => {
@@ -39,7 +46,6 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
     setFormData({
       primaryFont: clientData.primaryFont || 'Minal',
       secondaryFont: clientData.secondaryFont || 'Montserrat',
-      // Map old brandColor fields if they exist to the new primary/secondary structure
       primaryColor1: clientData.primaryColor1 || clientData.brandColor1 || '#F3F8F1',
       primaryColor2: clientData.primaryColor2 || clientData.brandColor2 || '#A28242',
       primaryColor3: clientData.primaryColor3 || clientData.brandColor3 || '#000000',
@@ -49,6 +55,9 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
       logoUrl: clientData.logoUrl || '',
       location: clientData.location || '',
       insta: clientData.insta || '',
+      facebook: clientData.facebook || '',
+      youtube: clientData.youtube || '',
+      tiktok: clientData.tiktok || '',
       tagline: clientData.tagline || '',
       webAddress: clientData.webAddress || '',
       email: clientData.email || ''
@@ -63,7 +72,6 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
       deleteClient(originalClientName);
     }
     
-    // Convert to backwards compatible colors just in case some templates still expect brandColorX
     const mergedData = {
       ...formData,
       brandColor1: formData.primaryColor1,
@@ -75,7 +83,6 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
     saveClient(editingClient, mergedData);
     setOriginalClientName(editingClient);
     
-    // Auto-load if it's the active one or if they just created it
     if (state.activeClient === originalClientName || state.activeClient === editingClient || !originalClientName) {
       loadClient(editingClient);
     }
@@ -92,6 +99,34 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
       deleteClient(originalClientName);
       setEditingClient('');
       setOriginalClientName('');
+    }
+  };
+
+  const handleLogoUpload = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const storageRef = ref(storage, `logos/${Date.now()}_${file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      setIsUploading(true);
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress);
+        }, 
+        (error) => {
+          console.error("Upload error:", error);
+          setIsUploading(false);
+          alert("Error uploading logo.");
+        }, 
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setFormData({...formData, logoUrl: downloadURL});
+            setIsUploading(false);
+            setUploadProgress(0);
+          });
+        }
+      );
     }
   };
 
@@ -165,6 +200,15 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
 
                 <div className="bm-field-row">
                   <div className="bm-field">
+                    <label>Location</label>
+                    <input 
+                      type="text" 
+                      value={formData.location} 
+                      onChange={e => setFormData({...formData, location: e.target.value})} 
+                      placeholder="London, UK"
+                    />
+                  </div>
+                  <div className="bm-field">
                     <label>Insta Handle</label>
                     <input 
                       type="text" 
@@ -173,14 +217,40 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                       placeholder="@brandname"
                     />
                   </div>
+                </div>
+
+                <div className="bm-field-row">
                   <div className="bm-field">
-                    <label>Location</label>
+                    <label>Facebook</label>
                     <input 
                       type="text" 
-                      value={formData.location} 
-                      onChange={e => setFormData({...formData, location: e.target.value})} 
-                      placeholder="London, UK"
+                      value={formData.facebook} 
+                      onChange={e => setFormData({...formData, facebook: e.target.value})} 
+                      placeholder="fb.com/brand"
                     />
+                  </div>
+                  <div className="bm-field">
+                    <label>YouTube</label>
+                    <input 
+                      type="text" 
+                      value={formData.youtube} 
+                      onChange={e => setFormData({...formData, youtube: e.target.value})} 
+                      placeholder="youtube.com/@brand"
+                    />
+                  </div>
+                </div>
+
+                <div className="bm-field-row">
+                  <div className="bm-field">
+                    <label>TikTok</label>
+                    <input 
+                      type="text" 
+                      value={formData.tiktok} 
+                      onChange={e => setFormData({...formData, tiktok: e.target.value})} 
+                      placeholder="@brand"
+                    />
+                  </div>
+                  <div className="bm-field">
                   </div>
                 </div>
                 
@@ -197,13 +267,31 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                 </div>
 
                 <div className="bm-field">
-                  <label>Logo URL</label>
-                  <input 
-                    type="text" 
-                    value={formData.logoUrl} 
-                    onChange={e => setFormData({...formData, logoUrl: e.target.value})} 
-                    placeholder="https://..."
-                  />
+                  <label>Brand Logo</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {formData.logoUrl && (
+                      <div style={{ width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', background: '#000' }}>
+                        <img src={formData.logoUrl} alt="Logo Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      </div>
+                    )}
+                    <div style={{ flex: 1, position: 'relative' }}>
+                      <label style={{
+                        display: 'inline-block',
+                        padding: '8px 16px',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        borderRadius: '6px',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        width: '100%',
+                        textAlign: 'center'
+                      }}>
+                        {isUploading ? `Uploading... ${Math.round(uploadProgress)}%` : (formData.logoUrl ? 'Change Logo Image' : 'Upload Logo Image')}
+                        <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} disabled={isUploading} />
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="bm-field-row">

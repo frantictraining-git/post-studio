@@ -265,6 +265,9 @@ function makeInitialState() {
       email: 'hello@brand.com',
       webAddress: 'www.brand.com',
       insta: '@brand',
+      facebook: '',
+      youtube: '',
+      tiktok: '',
       tagline: 'Your daily dose of inspiration',
       location: 'Slough, Greater London'
     },
@@ -438,6 +441,15 @@ function reducer(state, action) {
         }
         if (updatedZones.instagram) {
           updatedZones.instagram = { ...updatedZones.instagram, text: theme.insta || '' };
+        }
+        if (updatedZones.facebook) {
+          updatedZones.facebook = { ...updatedZones.facebook, text: theme.facebook || '' };
+        }
+        if (updatedZones.youtube) {
+          updatedZones.youtube = { ...updatedZones.youtube, text: theme.youtube || '' };
+        }
+        if (updatedZones.tiktok) {
+          updatedZones.tiktok = { ...updatedZones.tiktok, text: theme.tiktok || '' };
         }
 
         return {
