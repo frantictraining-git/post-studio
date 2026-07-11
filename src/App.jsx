@@ -3,6 +3,7 @@ import { useStudio } from './hooks/useStudio';
 import ControlPanel from './components/Sidebar/ControlPanel';
 import PreviewFrame from './components/Preview/PreviewFrame';
 import BrandManagerModal from './components/Sidebar/BrandManagerModal';
+import NotesWidget from './components/Notes/NotesWidget';
 import './App.css';
 
 function App() {
@@ -82,6 +83,7 @@ function App() {
         deleteClient={deleteClient}
         loadClient={loadClient}
       />
+      <NotesWidget />
     </div>
   );
 }

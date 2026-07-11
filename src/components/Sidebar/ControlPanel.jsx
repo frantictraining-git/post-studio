@@ -267,6 +267,32 @@ export default function ControlPanel({
           </div>
         </div>
 
+        {/* Logo Controls */}
+        <div className="cp-section">
+          <h2 className="cp-section-title">Logo Controls</h2>
+          <div className="cp-group">
+            <div className="cp-row">
+              <label className="cp-label">Scale</label>
+              <span className="cp-val">{logo.scale.toFixed(2)}x</span>
+            </div>
+            <input type="range" min="0.1" max="2.0" step="0.05" value={logo.scale} onChange={(e) => setLogo({ scale: Number(e.target.value) })} />
+          </div>
+          <div className="cp-group">
+            <div className="cp-row">
+              <label className="cp-label">X Position</label>
+              <span className="cp-val">{logo.x}%</span>
+            </div>
+            <input type="range" min="0" max="100" step="1" value={logo.x} onChange={(e) => setLogo({ x: Number(e.target.value) })} />
+          </div>
+          <div className="cp-group">
+            <div className="cp-row">
+              <label className="cp-label">Y Position</label>
+              <span className="cp-val">{logo.y}%</span>
+            </div>
+            <input type="range" min="0" max="100" step="1" value={logo.y} onChange={(e) => setLogo({ y: Number(e.target.value) })} />
+          </div>
+        </div>
+
         {/* Foreground / Overlay */}
         <div className="cp-section">
           <h2 className="cp-section-title">Foreground Layer</h2>
