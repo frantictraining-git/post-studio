@@ -1,5 +1,5 @@
 import React from 'react';
-import { SharedLayers, TextZone } from './SharedLayers';
+import { SharedLayers, TextZone, LayoutWrapper } from './SharedLayers';
 import './templates.css';
 
 export default function T2_RoyalStatement({ tpl, selectedZoneId, onSelectZone, onTextChange }) {
@@ -7,6 +7,7 @@ export default function T2_RoyalStatement({ tpl, selectedZoneId, onSelectZone, o
   return (
     <div className="tpl-wrap" style={{ backgroundColor: '#0d0b07' }}>
       <SharedLayers tpl={tpl} />
+      <LayoutWrapper category={tpl.category}>
       
       <div className="tpl-2-upper">
         <TextZone id="pre" zone={zones.pre} selectedZoneId={selectedZoneId} onSelect={onSelectZone} onTextChange={onTextChange} styleOverrides={{ marginTop: '30px', marginBottom: '-5px' }} maxWidth="90%" />
@@ -23,6 +24,7 @@ export default function T2_RoyalStatement({ tpl, selectedZoneId, onSelectZone, o
       </div>
       
       <div className="tpl-2-lower-gradient" />
-    </div>
+    
+      </LayoutWrapper></div>
   );
 }

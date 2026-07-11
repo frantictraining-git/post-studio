@@ -14,7 +14,7 @@ function App() {
     setHero,
     setFg,
     setLogo,
-    setGrade,
+    setOverlay,
     setZoneText,
     setZoneStyle,
     setSelectedZoneId,
@@ -54,7 +54,7 @@ function App() {
         setHero={setHero}
         setFg={setFg}
         setLogo={setLogo}
-        setGrade={setGrade}
+        setOverlay={setOverlay}
         setZoneText={setZoneText}
         setZoneStyle={setZoneStyle}
         setSelectedZoneId={setSelectedZoneId}

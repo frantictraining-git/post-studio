@@ -1,5 +1,5 @@
 import React from 'react';
-import { SharedLayers, TextZone } from './SharedLayers';
+import { SharedLayers, TextZone, LayoutWrapper } from './SharedLayers';
 import './templates.css';
 
 export default function T6_RoyalFeast({ tpl, selectedZoneId, onSelectZone, onTextChange }) {
@@ -7,6 +7,7 @@ export default function T6_RoyalFeast({ tpl, selectedZoneId, onSelectZone, onTex
   return (
     <div className="tpl-wrap" style={{ backgroundColor: '#000000' }}>
       <SharedLayers tpl={tpl} />
+      <LayoutWrapper category={tpl.category}>
       
       {/* Deep cinematic gradient mask */}
       <div className="tpl-6-gradient" />
@@ -42,6 +43,7 @@ export default function T6_RoyalFeast({ tpl, selectedZoneId, onSelectZone, onTex
       </div>
       
       <div className="tpl-6-lower-gradient" />
-    </div>
+    
+      </LayoutWrapper></div>
   );
 }

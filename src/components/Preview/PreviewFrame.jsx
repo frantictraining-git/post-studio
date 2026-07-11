@@ -33,7 +33,7 @@ const TEMPLATES = [
   T14_FuelYourMorning,
 ];
 
-const CATEGORIES = ['Minimal', 'Modern', 'Light', 'Dark', 'Gold', 'Green', 'Black', 'Breakfast'];
+const CATEGORIES = ['Editorial', 'Arch', 'Glassmorphism', 'Classic'];
 
 export default function PreviewFrame({ state, activeTpl, setHero, setFg, setLogo, setActiveTemplate, setSelectedZoneId, setZoneText, TEMPLATE_DEFAULTS }) {
   const ActiveComponent = TEMPLATES[state.activeTemplate];
@@ -41,7 +41,13 @@ export default function PreviewFrame({ state, activeTpl, setHero, setFg, setLogo
   
   const [isExporting, setIsExporting] = useState(false);
   const [dragLayer, setDragLayer] = useState(null); // 'hero', 'fg', or 'logo'
-  const [activeCategory, setActiveCategory] = useState(activeTpl.category || 'Minimal');
+  const [activeCategory, setActiveCategory] = useState(activeTpl.category || 'Editorial');
+  
+  React.useEffect(() => {
+    if (!CATEGORIES.includes(activeCategory)) {
+      setActiveCategory('Editorial');
+    }
+  }, [activeCategory]);
   
   const handleExport = async () => {
     setIsExporting(true);

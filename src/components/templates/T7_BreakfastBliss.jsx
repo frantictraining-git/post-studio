@@ -1,5 +1,5 @@
 import React from 'react';
-import { SharedLayers, TextZone } from './SharedLayers';
+import { SharedLayers, TextZone, LayoutWrapper } from './SharedLayers';
 import './templates.css';
 
 export default function T7_BreakfastBliss({ tpl, selectedZoneId, onSelectZone, onTextChange }) {
@@ -7,6 +7,7 @@ export default function T7_BreakfastBliss({ tpl, selectedZoneId, onSelectZone, o
   return (
     <div className="tpl-wrap" style={{ backgroundColor: '#1a1a1a' }}>
       <SharedLayers tpl={tpl} />
+      <LayoutWrapper category={tpl.category}>
       
       {/* Top subtle vignette for text legibility */}
       <div className="tpl-7-gradient-top" />
@@ -70,6 +71,7 @@ export default function T7_BreakfastBliss({ tpl, selectedZoneId, onSelectZone, o
           onTextChange={onTextChange} 
         />
       </div>
-    </div>
+    
+      </LayoutWrapper></div>
   );
 }

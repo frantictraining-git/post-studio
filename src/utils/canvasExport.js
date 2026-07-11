@@ -4,6 +4,8 @@
  * Uses Canvas 2D API — zero dependencies.
  */
 
+import { getOverlayById } from '../assets/overlays';
+
 const W = 1080;
 const H = 1350;
 
@@ -308,39 +310,153 @@ export async function exportToPNG(activeTpl, tplIndex, portrait = true) {
   canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // ── Background ──
-  const bgColors = ['#15392D', '#0d0b07', '#0a1a12', '#0a150e', '#0d0d10'];
-  ctx.fillStyle = bgColors[tplIndex] || '#15392D';
+  const { category, overlay } = activeTpl;
+  const isArch = category === 'Arch';
+  const isEditorial = category === 'Editorial';
+  const isGlass = category === 'Glassmorphism';
+  const isClassic = category === 'Classic';
+
+  // ── 1. Background Fill (For Editorial Split) ──
+  const activeOverlay = getOverlayById(overlay ? overlay.id : 'none');
+  ctx.fillStyle = '#0a0a08'; // Default fallback
+  if (isEditorial && activeOverlay.type === 'solid') {
+    ctx.fillStyle = activeOverlay.css;
+  }
   ctx.fillRect(0, 0, W, H);
 
-  // ── Hero Image ──
+  // ── 2. Background Image ──
   const { hero } = activeTpl;
   if (hero.url) {
     try {
       const img = await loadImage(hero.url);
       ctx.save();
+      
+      // Apply structural masks
+      if (isArch) {
+        // Draw an Arch mask (radius 500 on top corners, rect on bottom)
+        ctx.beginPath();
+        const ax = W * 0.1, ay = H * 0.15, aw = W * 0.8, ah = H * 0.85;
+        const rad = 500;
+        ctx.moveTo(ax + rad, ay);
+        ctx.lineTo(ax + aw - rad, ay);
+        ctx.arcTo(ax + aw, ay, ax + aw, ay + rad, rad);
+        ctx.lineTo(ax + aw, ay + ah);
+        ctx.lineTo(ax, ay + ah);
+        ctx.lineTo(ax, ay + rad);
+        ctx.arcTo(ax, ay, ax + rad, ay, rad);
+        ctx.closePath();
+        ctx.clip();
+      } else if (isEditorial) {
+        // Draw image only on the right half
+        ctx.beginPath();
+        ctx.rect(W / 2, 0, W / 2, H);
+        ctx.clip();
+      }
+
       if (hero.blur > 0) ctx.filter = `blur(${hero.blur * 2}px)`;
-      drawCover(ctx, img, 0, 0, W, H, hero.x, hero.y, hero.scale, hero.mirror);
+      
+      // Draw image to fill its container
+      if (isEditorial) {
+        drawCover(ctx, img, W / 2, 0, W / 2, H, hero.x, hero.y, hero.scale, hero.mirror);
+      } else {
+        drawCover(ctx, img, 0, 0, W, H, hero.x, hero.y, hero.scale, hero.mirror);
+      }
+      
       ctx.filter = 'none';
       ctx.restore();
     } catch (e) { console.warn('Hero image error', e); }
   }
 
-  // ── Color Grade ──
-  const { grade } = activeTpl;
-  if (grade.preset !== 'none' && grade.intensity > 0) {
-    const colorMap = {
-      green: '#15392D', amber: '#564020', noir: '#0a0a08',
-      sage: '#2B562A', warm: '#3a2010', custom: grade.custom,
-    };
-    const color = colorMap[grade.preset] || grade.custom;
-    const prevComposite = ctx.globalCompositeOperation;
-    ctx.globalCompositeOperation = grade.blendMode || 'multiply';
-    ctx.globalAlpha = grade.intensity / 100;
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, W, H);
-    ctx.globalCompositeOperation = prevComposite;
-    ctx.globalAlpha = 1;
+  // ── Overlay Layer ──
+  if (overlay) {
+    const overlayOpacity = overlay.opacity / 100;
+
+    if (activeOverlay.id !== 'none' && overlayOpacity > 0) {
+      ctx.save();
+      
+      if (isArch) {
+        ctx.beginPath();
+        const ax = W * 0.1, ay = H * 0.15, aw = W * 0.8, ah = H * 0.85;
+        const rad = 500;
+        ctx.moveTo(ax + rad, ay);
+        ctx.lineTo(ax + aw - rad, ay);
+        ctx.arcTo(ax + aw, ay, ax + aw, ay + rad, rad);
+        ctx.lineTo(ax + aw, ay + ah);
+        ctx.lineTo(ax, ay + ah);
+        ctx.lineTo(ax, ay + rad);
+        ctx.arcTo(ax, ay, ax + rad, ay, rad);
+        ctx.closePath();
+        ctx.clip();
+      } else if (isEditorial) {
+        ctx.beginPath();
+        ctx.rect(W / 2, 0, W / 2, H);
+        ctx.clip();
+      }
+
+      const prevComposite = ctx.globalCompositeOperation;
+      ctx.globalCompositeOperation = activeOverlay.blend_mode || 'normal';
+      ctx.globalAlpha = overlayOpacity;
+
+      if (activeOverlay.type === 'solid') {
+        ctx.fillStyle = activeOverlay.css;
+      } else if (activeOverlay.id === 'dark-fade-bottom') {
+        const grad = ctx.createLinearGradient(0, H, 0, H * 0.3);
+        grad.addColorStop(0, 'rgba(0,0,0,1)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+      } else if (activeOverlay.id === 'dark-fade-top') {
+        const grad = ctx.createLinearGradient(0, 0, 0, H * 0.6);
+        grad.addColorStop(0, 'rgba(0,0,0,0.9)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+      } else if (activeOverlay.id === 'warm-glow-center') {
+        const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.7);
+        grad.addColorStop(0, 'rgba(255,200,100,0.8)');
+        grad.addColorStop(1, 'rgba(255,200,100,0)');
+        ctx.fillStyle = grad;
+      } else if (activeOverlay.id === 'light-fade-bottom') {
+        const grad = ctx.createLinearGradient(0, H, 0, H * 0.3);
+        grad.addColorStop(0, 'rgba(255,255,255,1)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = grad;
+      } else {
+        ctx.fillStyle = 'transparent';
+      }
+
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
+  }
+
+  // ── Glassmorphism Layer ──
+  if (isGlass) {
+    ctx.save();
+    const gx = W * 0.1, gy = H * 0.15, gw = W * 0.8, gh = H * 0.7;
+    const rad = 24;
+    
+    // Create rounded rect path for glass
+    ctx.beginPath();
+    ctx.moveTo(gx + rad, gy);
+    ctx.lineTo(gx + gw - rad, gy);
+    ctx.arcTo(gx + gw, gy, gx + gw, gy + rad, rad);
+    ctx.lineTo(gx + gw, gy + gh - rad);
+    ctx.arcTo(gx + gw, gy + gh, gx + gw - rad, gy + gh, rad);
+    ctx.lineTo(gx + rad, gy + gh);
+    ctx.arcTo(gx, gy + gh, gx, gy + gh - rad, rad);
+    ctx.lineTo(gx, gy + rad);
+    ctx.arcTo(gx, gy, gx + rad, gy, rad);
+    ctx.closePath();
+
+    // Fill with translucent white
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.fill();
+
+    // Add border
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.stroke();
+
+    ctx.restore();
   }
 
   // ── Foreground Layer ──

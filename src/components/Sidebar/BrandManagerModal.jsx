@@ -6,13 +6,14 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 const DEFAULT_FORM_DATA = {
   primaryFont: 'Minal',
   secondaryFont: 'Montserrat',
+  logoWhiteUrl: '',
+  logoColoredUrl: '',
   primaryColor1: '#F3F8F1',
   primaryColor2: '#A28242',
   primaryColor3: '#000000',
   secondaryColor1: '#FFFFFF',
   secondaryColor2: '#DDDDDD',
   secondaryColor3: '#999999',
-  logoUrl: '',
   location: '',
   insta: '',
   facebook: '',
@@ -20,15 +21,19 @@ const DEFAULT_FORM_DATA = {
   tiktok: '',
   tagline: '',
   webAddress: '',
-  email: ''
+  email: '',
+  phone: ''
 };
 
 export default function BrandManagerModal({ isOpen, onClose, state, saveClient, deleteClient, loadClient }) {
   const [editingClient, setEditingClient] = useState('');
   const [originalClientName, setOriginalClientName] = useState('');
   const [formData, setFormData] = useState({ ...DEFAULT_FORM_DATA });
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadState, setUploadState] = useState({
+    isUploadingLogoWhite: false,
+    isUploadingLogoColored: false,
+    uploadProgress: 0
+  });
 
   // When modal opens, default to active client
   useEffect(() => {
@@ -52,7 +57,8 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
       secondaryColor1: clientData.secondaryColor1 || clientData.brandColor4 || '#FFFFFF',
       secondaryColor2: clientData.secondaryColor2 || '#DDDDDD',
       secondaryColor3: clientData.secondaryColor3 || '#999999',
-      logoUrl: clientData.logoUrl || '',
+      logoWhiteUrl: clientData.logoWhiteUrl || '',
+      logoColoredUrl: clientData.logoColoredUrl || '',
       location: clientData.location || '',
       insta: clientData.insta || '',
       facebook: clientData.facebook || '',
@@ -60,7 +66,8 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
       tiktok: clientData.tiktok || '',
       tagline: clientData.tagline || '',
       webAddress: clientData.webAddress || '',
-      email: clientData.email || ''
+      email: clientData.email || '',
+      phone: clientData.phone || ''
     });
   };
 
@@ -102,32 +109,34 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
     }
   };
 
-  const handleLogoUpload = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const storageRef = ref(storage, `logos/${Date.now()}_${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+  const handleLogoUpload = (e, variant) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-      setIsUploading(true);
-      uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        }, 
-        (error) => {
-          console.error("Upload error:", error);
-          setIsUploading(false);
-          alert("Error uploading logo.");
-        }, 
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setFormData({...formData, logoUrl: downloadURL});
-            setIsUploading(false);
-            setUploadProgress(0);
-          });
-        }
-      );
-    }
+    const variantKey = variant === 'white' ? 'isUploadingLogoWhite' : 'isUploadingLogoColored';
+    const formKey = variant === 'white' ? 'logoWhiteUrl' : 'logoColoredUrl';
+
+    setUploadState(prev => ({...prev, [variantKey]: true, uploadProgress: 0}));
+    const storageRef = ref(storage, `logos/${Date.now()}_${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadState(prev => ({...prev, uploadProgress: progress}));
+      }, 
+      (error) => {
+        console.error("Upload error:", error);
+        setUploadState(prev => ({...prev, [variantKey]: false}));
+        alert("Error uploading logo.");
+      }, 
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setFormData({...formData, [formKey]: downloadURL});
+          setUploadState(prev => ({...prev, [variantKey]: false, uploadProgress: 0}));
+        });
+      }
+    );
   };
 
   return (
@@ -267,29 +276,44 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                 </div>
 
                 <div className="bm-field">
-                  <label>Brand Logo</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    {formData.logoUrl && (
-                      <div style={{ width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', background: '#000' }}>
-                        <img src={formData.logoUrl} alt="Logo Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  <label>Brand Logos (Firebase Storage)</label>
+                  <p style={{fontSize: 12, color: '#aaa', marginBottom: 8}}>Upload both versions of your logo.</p>
+                  
+                  <div style={{ display: 'flex', gap: '15px', flexDirection: 'column' }}>
+                    {/* White Logo */}
+                    <div style={{ flex: 1, padding: 10, background: '#222', borderRadius: 6 }}>
+                      <label style={{ fontSize: '12px', display: 'block', marginBottom: 8 }}>White Variant (For dark backgrounds)</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {formData.logoWhiteUrl && (
+                          <div style={{ width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', background: '#000' }}>
+                            <img src={formData.logoWhiteUrl} alt="White Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                          </div>
+                        )}
+                        <label style={{
+                          display: 'inline-block', padding: '8px 16px', background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '13px', textAlign: 'center', flex: 1
+                        }}>
+                          {uploadState.isUploadingLogoWhite ? `Uploading... ${Math.round(uploadState.uploadProgress)}%` : (formData.logoWhiteUrl ? 'Change White Logo' : 'Upload White Logo')}
+                          <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'white')} style={{ display: 'none' }} disabled={uploadState.isUploadingLogoWhite} />
+                        </label>
                       </div>
-                    )}
-                    <div style={{ flex: 1, position: 'relative' }}>
-                      <label style={{
-                        display: 'inline-block',
-                        padding: '8px 16px',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        borderRadius: '6px',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        width: '100%',
-                        textAlign: 'center'
-                      }}>
-                        {isUploading ? `Uploading... ${Math.round(uploadProgress)}%` : (formData.logoUrl ? 'Change Logo Image' : 'Upload Logo Image')}
-                        <input type="file" accept="image/*" onChange={handleLogoUpload} style={{ display: 'none' }} disabled={isUploading} />
-                      </label>
+                    </div>
+
+                    {/* Colored Logo */}
+                    <div style={{ flex: 1, padding: 10, background: '#f5f5f5', borderRadius: 6, color: '#000' }}>
+                      <label style={{ fontSize: '12px', display: 'block', marginBottom: 8, color: '#333' }}>Colored Variant (For light backgrounds)</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {formData.logoColoredUrl && (
+                          <div style={{ width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', background: '#fff', border: '1px solid #ddd' }}>
+                            <img src={formData.logoColoredUrl} alt="Colored Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                          </div>
+                        )}
+                        <label style={{
+                          display: 'inline-block', padding: '8px 16px', background: 'rgba(0, 0, 0, 0.1)', border: '1px solid rgba(0, 0, 0, 0.2)', borderRadius: '6px', color: '#000', cursor: 'pointer', fontSize: '13px', textAlign: 'center', flex: 1
+                        }}>
+                          {uploadState.isUploadingLogoColored ? `Uploading... ${Math.round(uploadState.uploadProgress)}%` : (formData.logoColoredUrl ? 'Change Colored Logo' : 'Upload Colored Logo')}
+                          <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'colored')} style={{ display: 'none' }} disabled={uploadState.isUploadingLogoColored} />
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -22,16 +22,7 @@ export const FONT_OPTIONS = [
   { label: 'Inter', value: 'Inter' },
 ];
 
-// ─── Grade Presets ─────────────────────────────────────────────────
-export const GRADE_PRESETS = {
-  none:   { label: 'None',   color: 'transparent' },
-  green:  { label: 'Forest', color: '#15392D' },
-  amber:  { label: 'Amber',  color: '#564020' },
-  noir:   { label: 'Noir',   color: '#0a0a08' },
-  sage:   { label: 'Sage',   color: '#2B562A' },
-  warm:   { label: 'Warm',   color: '#3a2010' },
-  custom: { label: 'Custom', color: '#15392D' },
-};
+import { OVERLAYS, getOverlayById } from '../assets/overlays';
 
 // ─── Default Zone Styles (per-zone type) ──────────────────────────
 const zoneDefaults = {
@@ -62,7 +53,7 @@ const makeZones = (overrides = {}) =>
 const TEMPLATE_DEFAULTS = [
   // T1: Dish Spotlight
   {
-    id: 't1', label: 'Dish Spotlight', icon: '🍽', category: 'Minimal',
+    id: 't1', label: 'Dish Spotlight', icon: '🍽', category: 'Editorial',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       ornament: { type:'ornament', text:'✦' },
@@ -76,7 +67,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T2: Royal Statement
   {
-    id: 't2', label: 'Royal Statement', icon: '✦', category: 'Gold',
+    id: 't2', label: 'Royal Statement', icon: '✦', category: 'Editorial',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       pre:      { type:'goldSub',   text:'A', align:'center', size:36 },
@@ -86,7 +77,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T3: Ambient Mood
   {
-    id: 't3', label: 'Ambient Mood', icon: '🌿', category: 'Dark',
+    id: 't3', label: 'Ambient Mood', icon: '🌿', category: 'Arch',
     defaultGrade: { preset: 'green', intensity: 38, blend: 'multiply' },
     zones: makeZones({
       handle:   { type:'handle',    text:'@easteateryofficial' },
@@ -97,7 +88,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T4: Floating Verse
   {
-    id: 't4', label: 'Floating Verse', icon: '🎶', category: 'Modern',
+    id: 't4', label: 'Floating Verse', icon: '🎶', category: 'Arch',
     defaultGrade: { preset: 'green', intensity: 30, blend: 'multiply' },
     zones: makeZones({
       handle:   { type:'handle',    text:'@easteateryofficial' },
@@ -109,7 +100,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T5: Artisan Frame
   {
-    id: 't5', label: 'Artisan Frame', icon: '🔥', category: 'Black',
+    id: 't5', label: 'Artisan Frame', icon: '🔥', category: 'Arch',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       eyebrow:  { type:'eyebrow', text:'Fine Dining Experience', align:'left', size:22, family:'Cormorant Garamond', weight:'300', caps:false },
@@ -120,7 +111,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T6: Royal Feast
   {
-    id: 't6', label: 'Royal Feast', icon: '✨', category: 'Gold',
+    id: 't6', label: 'Royal Feast', icon: '✨', category: 'Classic',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       pre:      { type:'goldSub',   text:'A', align:'center', size:36, family: 'Cormorant Garamond' },
@@ -130,7 +121,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T7: Breakfast Bliss
   {
-    id: 't7', label: 'Breakfast Bliss', icon: '🍳', category: 'Breakfast',
+    id: 't7', label: 'Breakfast Bliss', icon: '🍳', category: 'Editorial',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       eyebrow:  { type:'artSub', text:'tasty', align:'center', size: 60, color: '#fff', family: 'Playfair Display', tracking: 0, weight: '500' },
@@ -143,7 +134,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T8: Brunch Bliss
   {
-    id: 't8', label: 'Brunch Bliss', icon: '🥞', category: 'Breakfast',
+    id: 't8', label: 'Brunch Bliss', icon: '🥞', category: 'Glassmorphism',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       h2:       { type:'artSub', text:'golden', align:'center', size: 60, color: '#A28242', family: 'Great Vibes', tracking: 0, weight: '400' },
@@ -156,7 +147,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T9: Morning Mood
   {
-    id: 't9', label: 'Morning Mood', icon: '🍓', category: 'Breakfast',
+    id: 't9', label: 'Morning Mood', icon: '🍓', category: 'Classic',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 120, tracking: -5, color: '#E53935', shadow: 'hard' },
@@ -167,7 +158,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T10: Perfect Harmony
   {
-    id: 't10', label: 'Perfect Harmony', icon: '🍽️', category: 'Modern',
+    id: 't10', label: 'Perfect Harmony', icon: '🍽️', category: 'Glassmorphism',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       eyebrow:  { type:'tagline', text:'YOUR PRESENTS', align:'center', family: 'Inter', weight: '300', caps: true, size: 14, tracking: 4, color: '#fff' },
@@ -181,7 +172,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T11: Tasty Morning Joy
   {
-    id: 't11', label: 'Tasty Morning', icon: '🍳', category: 'Breakfast',
+    id: 't11', label: 'Tasty Morning', icon: '🍳', category: 'Classic',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       h2:       { type:'artSub', text:'tasty', align:'center', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
@@ -194,7 +185,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T12: Golden Brunch Bliss
   {
-    id: 't12', label: 'Golden Brunch', icon: '🥞', category: 'Breakfast',
+    id: 't12', label: 'Golden Brunch', icon: '🥞', category: 'Glassmorphism',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       h2:       { type:'artSub', text:'golden', align:'center', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
@@ -207,7 +198,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T13: Morning Mood
   {
-    id: 't13', label: 'Morning Mood', icon: '🍓', category: 'Breakfast',
+    id: 't13', label: 'Morning Mood', icon: '🍓', category: 'Editorial',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 130, tracking: -5, color: '#A01515', shadow: 'none' },
@@ -218,7 +209,7 @@ const TEMPLATE_DEFAULTS = [
   },
   // T14: Fuel Your Morning
   {
-    id: 't14', label: 'Fuel Your Morning', icon: '🥪', category: 'Breakfast',
+    id: 't14', label: 'Fuel Your Morning', icon: '🥪', category: 'Arch',
     defaultGrade: { preset: 'none', intensity: 0 },
     zones: makeZones({
       h1:       { type:'h1', text:'Fuel your\nmorning', align:'left', family: 'Cormorant Garamond', weight: '600', caps: false, size: 60, tracking: 0, color: '#FFFFFF', shadow: 'soft' },
@@ -245,7 +236,8 @@ function makeInitialState() {
       secondaryColor1: '#FFFFFF',
       secondaryColor2: '#DDDDDD',
       secondaryColor3: '#999999',
-      logoUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
+      logoWhiteUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
+      logoColoredUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
       phone: '+44 1234 567890',
       email: 'hello@brand.com',
       webAddress: 'www.brand.com',
@@ -283,7 +275,8 @@ function makeInitialState() {
       secondaryColor1: '#FFFFFF',
       secondaryColor2: '#DDDDDD',
       secondaryColor3: '#999999',
-      logoUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
+      logoWhiteUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
+      logoColoredUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
       phone: '+44 1234 567890',
       email: 'hello@brand.com',
       webAddress: 'www.brand.com',
@@ -297,7 +290,7 @@ function makeInitialState() {
     hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false },
     fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
     logo: { url: null, scale: 0.3, x: 50, y: 15 },
-    grade: { preset: 'none', custom: '#15392D', intensity: 35, blendMode: 'multiply' },
+    overlay: { id: 'none', opacity: 100 },
     templates: TEMPLATE_DEFAULTS.map(t => {
       // Set the generated hero image exclusively for T6 and T7
       let defaultHeroUrl = null;
@@ -326,7 +319,7 @@ function makeInitialState() {
         hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false },
         fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
         logo: { url: null, scale: 0.3, x: 50, y: 15 },
-        grade: { ...t.defaultGrade, blendMode: 'multiply', custom: '#15392D' },
+        overlay: { id: t.defaultOverlay || 'none', opacity: 100 },
         zones: JSON.parse(JSON.stringify(t.zones)),
       };
     }),
@@ -344,38 +337,57 @@ function reducer(state, action) {
     return { ...state, templates };
   };
 
+  const applyOverlayLogic = (template, overlayId, theme) => {
+    const overlay = getOverlayById(overlayId);
+    const isWhite = overlay.recommended_text_color === 'white';
+    const textColor = isWhite ? '#FFFFFF' : (theme.primaryColor3 || '#000000');
+    // Fallback logic: if only one logo is uploaded, use it.
+    let logoUrl = isWhite ? theme.logoWhiteUrl : theme.logoColoredUrl;
+    if (!logoUrl) logoUrl = theme.logoWhiteUrl || theme.logoColoredUrl || 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media';
+
+    const newZones = { ...template.zones };
+    for (const key in newZones) {
+      const zone = newZones[key];
+      // Auto-color logic based on overlay legibility
+      const zColor = isWhite ? '#FFFFFF' : (theme.primaryColor3 || '#000000');
+      
+      // Font inheritance logic
+      let zFamily = zone.family;
+      const type = zone.type || key;
+      if (['h1', 'eyebrow', 'brandSub', 'gold', 'verse', 'artisan'].includes(type)) {
+        zFamily = 'var(--primaryFont)';
+      } else if (['h2', 'tagline', 'footer', 'handle', 'contactInfo', 'website', 'social', 'phone', 'location'].includes(type)) {
+        zFamily = 'var(--secondaryFont)';
+      }
+      // 'artSub' and other script/accent types keep their inherent template fonts
+
+      newZones[key] = { ...zone, color: zColor, family: zFamily };
+    }
+
+    return {
+      ...template,
+      overlay: { id: overlay.id, opacity: template.overlay ? template.overlay.opacity : overlay.default_opacity },
+      logo: { ...template.logo, url: logoUrl },
+      zones: newZones
+    };
+  };
+
   switch (type) {
-    case 'SET_ACTIVE_TEMPLATE':
-      return { ...state, activeTemplate: payload };
+    case 'SET_ACTIVE_TEMPLATE': {
+      const idx = payload;
+      const t = state.templates[idx];
+      const updatedT = applyOverlayLogic(t, t.overlay.id, state.brandTheme);
+      const newTemplates = [...state.templates];
+      newTemplates[idx] = updatedT;
+      return { ...state, activeTemplate: idx, templates: newTemplates };
+    }
 
     case 'SET_SELECTED_ZONE':
       return { ...state, selectedZoneId: payload };
 
     case 'SET_BRAND_THEME': {
       const newTheme = { ...state.brandTheme, ...payload };
-      let updatedTemplates = state.templates.map(t => {
-        let updatedZones = { ...t.zones };
-        let changed = false;
-        
-        if (payload.logoUrl !== undefined) {
-          t = { ...t, logo: { ...t.logo, url: payload.logoUrl } };
-          changed = true;
-        }
-        if (payload.phone !== undefined && updatedZones.phone) {
-          updatedZones.phone = { ...updatedZones.phone, text: payload.phone };
-          changed = true;
-        }
-        if (payload.location !== undefined && updatedZones.location) {
-          updatedZones.location = { ...updatedZones.location, text: payload.location };
-          changed = true;
-        }
-        
-        if (changed) {
-          return { ...t, zones: updatedZones };
-        }
-        return t;
-      });
-      
+      let updatedTemplates = state.templates.map(t => applyOverlayLogic(t, t.overlay.id, newTheme));
       return { ...state, brandTheme: newTheme, templates: updatedTemplates };
     }
 
@@ -429,58 +441,25 @@ function reducer(state, action) {
         }
         let updatedZones = { ...t.zones };
         
-        // Map contact info
-        if (updatedZones.phone) {
-          updatedZones.phone = { ...updatedZones.phone, text: theme.email || theme.phone || '' };
-        }
-        if (updatedZones.contact) {
-          updatedZones.contact = { ...updatedZones.contact, text: theme.email || theme.phone || '' };
-        }
-        
-        // Map location
-        if (updatedZones.location) {
-          updatedZones.location = { ...updatedZones.location, text: theme.location || '' };
-        }
-        if (updatedZones.address) {
-          updatedZones.address = { ...updatedZones.address, text: theme.location || '' };
-        }
-        
-        // Map webAddress
-        if (updatedZones.website) {
-          updatedZones.website = { ...updatedZones.website, text: theme.webAddress || '' };
-        }
-        
-        // Map tagline
-        if (updatedZones.tagline) {
-          updatedZones.tagline = { ...updatedZones.tagline, text: theme.tagline || '' };
-        }
-        if (updatedZones.subtitle) {
-          updatedZones.subtitle = { ...updatedZones.subtitle, text: theme.tagline || '' };
-        }
-        
-        // Map insta handle
-        if (updatedZones.social) {
-          updatedZones.social = { ...updatedZones.social, text: theme.insta || '' };
-        }
-        if (updatedZones.instagram) {
-          updatedZones.instagram = { ...updatedZones.instagram, text: theme.insta || '' };
-        }
-        if (updatedZones.facebook) {
-          updatedZones.facebook = { ...updatedZones.facebook, text: theme.facebook || '' };
-        }
-        if (updatedZones.youtube) {
-          updatedZones.youtube = { ...updatedZones.youtube, text: theme.youtube || '' };
-        }
-        if (updatedZones.tiktok) {
-          updatedZones.tiktok = { ...updatedZones.tiktok, text: theme.tiktok || '' };
-        }
+        // Map brand data
+        if (updatedZones.phone) updatedZones.phone = { ...updatedZones.phone, text: theme.phone || '' };
+        if (updatedZones.location) updatedZones.location = { ...updatedZones.location, text: theme.location || '' };
+        if (updatedZones.website) updatedZones.website = { ...updatedZones.website, text: theme.webAddress || '' };
+        if (updatedZones.tagline) updatedZones.tagline = { ...updatedZones.tagline, text: theme.tagline || '' };
+        if (updatedZones.subtitle) updatedZones.subtitle = { ...updatedZones.subtitle, text: theme.tagline || '' };
+        if (updatedZones.social) updatedZones.social = { ...updatedZones.social, text: theme.insta || '' };
+        if (updatedZones.instagram) updatedZones.instagram = { ...updatedZones.instagram, text: theme.insta || '' };
+        if (updatedZones.facebook) updatedZones.facebook = { ...updatedZones.facebook, text: theme.facebook || '' };
+        if (updatedZones.youtube) updatedZones.youtube = { ...updatedZones.youtube, text: theme.youtube || '' };
+        if (updatedZones.tiktok) updatedZones.tiktok = { ...updatedZones.tiktok, text: theme.tiktok || '' };
 
-        return {
+        const tempT = {
           ...t,
-          logo: { ...t.logo, url: theme.logoUrl || 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media' },
           hero: { ...t.hero, url: defaultHeroUrl },
           zones: updatedZones
         };
+        
+        return applyOverlayLogic(tempT, tempT.overlay.id, theme);
       });
       
       return {
@@ -500,8 +479,19 @@ function reducer(state, action) {
     case 'SET_LOGO':
       return updateTemplate({ logo: { ...state.templates[tIdx].logo, ...payload } });
 
-    case 'SET_GRADE':
-      return updateTemplate({ grade: { ...state.templates[tIdx].grade, ...payload } });
+    case 'SET_OVERLAY': {
+      // payload could be { id: 'dark-fade' } or { opacity: 50 }
+      const newOverlay = { ...state.templates[tIdx].overlay, ...payload };
+      let newT = { ...state.templates[tIdx], overlay: newOverlay };
+      if (payload.id) {
+        newT = applyOverlayLogic(newT, payload.id, state.brandTheme);
+        // Ensure opacity resets if a new ID is picked
+        newT.overlay.opacity = getOverlayById(payload.id).default_opacity;
+      }
+      const templates = [...state.templates];
+      templates[tIdx] = newT;
+      return { ...state, templates };
+    }
 
     case 'SET_ZONE_TEXT': {
       const { zoneId, text } = payload;
@@ -534,10 +524,11 @@ function reducer(state, action) {
   }
 }
 
-// ─── Hook ──────────────────────────────────────────────────────────
+// ─── Main Hook ──────────────────────────────────────────────────────
 export function useStudio() {
   const [state, dispatch] = useReducer(reducer, null, makeInitialState);
 
+  // Sync clients to localStorage
   useEffect(() => {
     localStorage.setItem('postStudioClients', JSON.stringify({
       clients: state.clients,
@@ -572,8 +563,8 @@ export function useStudio() {
   const setLogo = useCallback((updates) =>
     dispatch({ type: 'SET_LOGO', payload: updates }), []);
 
-  const setGrade = useCallback((updates) =>
-    dispatch({ type: 'SET_GRADE', payload: updates }), []);
+  const setOverlay = useCallback((updates) =>
+    dispatch({ type: 'SET_OVERLAY', payload: updates }), []);
 
   const setZoneText = useCallback((zoneId, text) =>
     dispatch({ type: 'SET_ZONE_TEXT', payload: { zoneId, text } }), []);
@@ -595,7 +586,7 @@ export function useStudio() {
     setHero,
     setFg,
     setLogo,
-    setGrade,
+    setOverlay,
     setZoneText,
     setZoneStyle,
     TEMPLATE_DEFAULTS,

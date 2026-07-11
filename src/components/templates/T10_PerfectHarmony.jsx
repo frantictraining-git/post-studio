@@ -1,5 +1,5 @@
 import React from 'react';
-import { SharedLayers, TextZone } from './SharedLayers';
+import { SharedLayers, TextZone, LayoutWrapper } from './SharedLayers';
 import './templates.css';
 
 export default function T10_PerfectHarmony({ tpl, selectedZoneId, onSelectZone, onTextChange }) {
@@ -7,6 +7,7 @@ export default function T10_PerfectHarmony({ tpl, selectedZoneId, onSelectZone, 
   return (
     <div className="tpl-wrap" style={{ backgroundColor: '#1a1a1a' }}>
       <SharedLayers tpl={tpl} />
+      <LayoutWrapper category={tpl.category}>
       
       <div className="tpl-10-gradient" />
 
@@ -43,6 +44,7 @@ export default function T10_PerfectHarmony({ tpl, selectedZoneId, onSelectZone, 
         <TextZone id="phone" zone={zones.phone} selectedZoneId={selectedZoneId} onSelect={onSelectZone} onTextChange={onTextChange} />
         <TextZone id="location" zone={zones.location} selectedZoneId={selectedZoneId} onSelect={onSelectZone} onTextChange={onTextChange} />
       </div>
-    </div>
+    
+      </LayoutWrapper></div>
   );
 }

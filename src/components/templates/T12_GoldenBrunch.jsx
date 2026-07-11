@@ -1,5 +1,5 @@
 import React from 'react';
-import { SharedLayers, TextZone } from './SharedLayers';
+import { SharedLayers, TextZone, LayoutWrapper } from './SharedLayers';
 import './templates.css';
 
 export default function T12_GoldenBrunch({ tpl, selectedZoneId, onSelectZone, onTextChange }) {
@@ -7,6 +7,7 @@ export default function T12_GoldenBrunch({ tpl, selectedZoneId, onSelectZone, on
   return (
     <div className="tpl-wrap" style={{ backgroundColor: '#1a1a1a' }}>
       <SharedLayers tpl={tpl} />
+      <LayoutWrapper category={tpl.category}>
       <div className="tpl-12-gradient" />
       <div className="tpl-12-content">
         <TextZone id="h2" zone={zones.h2} selectedZoneId={selectedZoneId} onSelect={onSelectZone} onTextChange={onTextChange} styleOverrides={{ alignSelf: 'center', marginBottom: '-10px', zIndex: 2, position: 'relative' }} />
@@ -20,6 +21,7 @@ export default function T12_GoldenBrunch({ tpl, selectedZoneId, onSelectZone, on
         <TextZone id="phone" zone={zones.phone} selectedZoneId={selectedZoneId} onSelect={onSelectZone} onTextChange={onTextChange} />
         <TextZone id="location" zone={zones.location} selectedZoneId={selectedZoneId} onSelect={onSelectZone} onTextChange={onTextChange} />
       </div>
-    </div>
+    
+      </LayoutWrapper></div>
   );
 }

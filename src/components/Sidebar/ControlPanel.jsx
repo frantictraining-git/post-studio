@@ -1,6 +1,7 @@
 import React from 'react';
 import './ControlPanel.css';
-import { FONT_OPTIONS, GRADE_PRESETS } from '../../hooks/useStudio';
+import { FONT_OPTIONS } from '../../hooks/useStudio';
+import { OVERLAYS } from '../../assets/overlays';
 
 function ImageUpload({ label, onUpload, onClear, hasImage }) {
   return (
@@ -129,6 +130,7 @@ export default function ControlPanel({
   setHero, 
   setFg, 
   setLogo,
+  setOverlay,
   setGrade, 
   setZoneText, 
   setZoneStyle,
@@ -235,35 +237,33 @@ export default function ControlPanel({
           )}
         </div>
 
-        {/* Color Grade */}
+        {/* Overlay Layer */}
         <div className="cp-section">
-          <h2 className="cp-section-title">Color Grade</h2>
+          <h2 className="cp-section-title">Overlay Layer</h2>
           <div className="cp-row" style={{ marginBottom: 12 }}>
             <select 
-              value={grade.preset} 
-              onChange={(e) => setGrade({ preset: e.target.value })}
+              value={state.templates[state.activeTemplate].overlay.id} 
+              onChange={(e) => {
+                const overlayId = e.target.value;
+                const overlayDef = window.getOverlayById ? window.getOverlayById(overlayId) : { default_opacity: 100 }; // Wait, we need to import OVERLAYS
+                // For now just set the ID, useStudio handles opacity manually but we might want to auto-set opacity.
+                // Let's just set the ID.
+                setOverlay({ id: overlayId });
+              }}
               style={{ flex: 1 }}
             >
-              {Object.entries(GRADE_PRESETS).map(([k, v]) => (
-                <option key={k} value={k}>{v.label}</option>
+              {OVERLAYS.map((o) => (
+                <option key={o.id} value={o.id}>{o.name}</option>
               ))}
             </select>
-            {grade.preset === 'custom' && (
-              <input 
-                type="color" 
-                value={grade.custom} 
-                onChange={(e) => setGrade({ custom: e.target.value })} 
-                style={{ marginLeft: 8 }}
-              />
-            )}
           </div>
           
           <div className="cp-group">
             <div className="cp-row">
-              <label className="cp-label">Intensity</label>
-              <span className="cp-val">{grade.intensity}%</span>
+              <label className="cp-label">Opacity</label>
+              <span className="cp-val">{state.templates[state.activeTemplate].overlay.opacity}%</span>
             </div>
-            <input type="range" min="0" max="100" step="1" value={grade.intensity} onChange={(e) => setGrade({ intensity: Number(e.target.value) })} />
+            <input type="range" min="0" max="100" step="1" value={state.templates[state.activeTemplate].overlay.opacity} onChange={(e) => setOverlay({ opacity: Number(e.target.value) })} />
           </div>
         </div>
 

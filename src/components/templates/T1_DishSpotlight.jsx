@@ -1,5 +1,5 @@
 import React from 'react';
-import { SharedLayers, TextZone } from './SharedLayers';
+import { SharedLayers, TextZone, LayoutWrapper } from './SharedLayers';
 import './templates.css';
 
 export default function T1_DishSpotlight({ tpl, selectedZoneId, onSelectZone, onTextChange }) {
@@ -8,6 +8,7 @@ export default function T1_DishSpotlight({ tpl, selectedZoneId, onSelectZone, on
   return (
     <div className="tpl-wrap" style={{ backgroundColor: '#15392D' }}>
       <SharedLayers tpl={tpl} />
+      <LayoutWrapper category={tpl.category}>
       
       <div className="tpl-1-logo">
         <TextZone id="ornament" zone={zones.ornament} className="tpl-1-ornament" selectedZoneId={selectedZoneId} onSelect={onSelectZone} onTextChange={onTextChange} />
@@ -24,6 +25,7 @@ export default function T1_DishSpotlight({ tpl, selectedZoneId, onSelectZone, on
       <div className="tpl-1-footer">
         <TextZone id="footer" zone={zones.footer} selectedZoneId={selectedZoneId} onSelect={onSelectZone} onTextChange={onTextChange} />
       </div>
-    </div>
+    
+      </LayoutWrapper></div>
   );
 }
