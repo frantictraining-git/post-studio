@@ -52,7 +52,7 @@
 .pv-templates-row {
   display: flex;
   gap: 12px;
-  overflow-x: auto;
+  flex-wrap: wrap;
   padding-bottom: 4px;
 }
 .pv-tpl-mini-btn {

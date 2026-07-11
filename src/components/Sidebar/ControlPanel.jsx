@@ -18,6 +18,7 @@ function ImageUpload({ label, onUpload, onClear, hasImage }) {
             if (e.target.files && e.target.files[0]) {
               const url = URL.createObjectURL(e.target.files[0]);
               onUpload(url);
+              e.target.value = null;
             }
           }} 
           hidden 

@@ -10,6 +10,10 @@ import T7_BreakfastBliss from '../templates/T7_BreakfastBliss';
 import T8_BrunchBliss from '../templates/T8_BrunchBliss';
 import T9_MorningMood from '../templates/T9_MorningMood';
 import T10_PerfectHarmony from '../templates/T10_PerfectHarmony';
+import T11_TastyMorning from '../templates/T11_TastyMorning';
+import T12_GoldenBrunch from '../templates/T12_GoldenBrunch';
+import T13_MorningMood from '../templates/T13_MorningMood';
+import T14_FuelYourMorning from '../templates/T14_FuelYourMorning';
 import { exportToPNG } from '../../utils/canvasExport';
 
 const TEMPLATES = [
@@ -23,6 +27,10 @@ const TEMPLATES = [
   T8_BrunchBliss,
   T9_MorningMood,
   T10_PerfectHarmony,
+  T11_TastyMorning,
+  T12_GoldenBrunch,
+  T13_MorningMood,
+  T14_FuelYourMorning,
 ];
 
 const CATEGORIES = ['Minimal', 'Modern', 'Light', 'Dark', 'Gold', 'Green', 'Black', 'Breakfast'];

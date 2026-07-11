@@ -43,7 +43,7 @@
   z-index: 3;
 }
 .t-logo-img {
-  z-index: 4;
+  z-index: 20;
 }
 
 /* ─── T1: Dish Spotlight ─────────────────────────── */
@@ -418,4 +418,67 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
   max-width: 80%;
 }
+
+/* ─── T11, T12: Tasty / Golden ───────────────────────────────── */
+.tpl-11-gradient, .tpl-12-gradient {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+  z-index: 5;
+  pointer-events: none;
+}
+.tpl-11-content, .tpl-12-content {
+  position: absolute;
+  top: 15%; left: 10%; right: 10%;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+.tpl-11-bottom-row, .tpl-12-bottom-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+/* ─── T13: Morning Mood ──────────────────────────────────────── */
+.tpl-13-gradient {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+  z-index: 5;
+  pointer-events: none;
+}
+.tpl-13-content {
+  position: absolute;
+  top: 40%; left: 20px; right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 10;
+}
+
+/* ─── T14: Fuel Your Morning ─────────────────────────────────── */
+.tpl-14-gradient {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 40%, transparent 100%);
+  z-index: 5;
+  pointer-events: none;
+}
+.tpl-14-content {
+  position: absolute;
+  top: 10%; left: 8%; right: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  z-index: 10;
+}
+.tpl-14-side {
+  position: absolute;
+  top: 40%; right: 8%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+}
+
 

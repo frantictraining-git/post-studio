@@ -179,6 +179,57 @@ const TEMPLATE_DEFAULTS = [
       location: { type:'contactInfo', text:'Slough, Greater London', align: 'center' }
     }),
   },
+  // T11: Tasty Morning Joy
+  {
+    id: 't11', label: 'Tasty Morning', icon: '🍳', category: 'Breakfast',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      h2:       { type:'artSub', text:'tasty', align:'center', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
+      h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 100, tracking: -2, color: '#F3F8F1', shadow: 'soft' },
+      h3:       { type:'artSub', text:'joy', align:'left', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
+      tagline:  { type:'tagline', text:'Creamy eggs,\ntoasted sourdough,\nsimple perfection.', align: 'left', size: 14, color: '#fff', italic: false, family: 'Inter', weight: '400', tracking: 1 },
+      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
+      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
+    }),
+  },
+  // T12: Golden Brunch Bliss
+  {
+    id: 't12', label: 'Golden Brunch', icon: '🥞', category: 'Breakfast',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      h2:       { type:'artSub', text:'golden', align:'center', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
+      h1:       { type:'h1', text:'BRUNCH', align:'center', family: 'Inter', weight: '900', caps: true, size: 100, tracking: -2, color: '#F3F8F1', shadow: 'soft' },
+      h3:       { type:'artSub', text:'bliss', align:'left', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
+      tagline:  { type:'tagline', text:'Golden pancakes,\ndrizzled with honey\nbutter love.', align: 'left', size: 14, color: '#fff', italic: false, family: 'Inter', weight: '400', tracking: 1 },
+      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
+      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
+    }),
+  },
+  // T13: Morning Mood
+  {
+    id: 't13', label: 'Morning Mood', icon: '🍓', category: 'Breakfast',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 130, tracking: -5, color: '#A01515', shadow: 'none' },
+      tagline:  { type:'h1', text:'FLIP YOUR MOOD', align:'right', family: 'Inter', weight: '200', caps: true, size: 24, tracking: 4, color: '#D4C4A8', shadow: 'soft' },
+      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'right' },
+      location: { type:'contactInfo', text:'Slough, Greater London', align: 'right' }
+    }),
+  },
+  // T14: Fuel Your Morning
+  {
+    id: 't14', label: 'Fuel Your Morning', icon: '🥪', category: 'Breakfast',
+    defaultGrade: { preset: 'none', intensity: 0 },
+    zones: makeZones({
+      h1:       { type:'h1', text:'Fuel your\nmorning', align:'left', family: 'Cormorant Garamond', weight: '600', caps: false, size: 60, tracking: 0, color: '#FFFFFF', shadow: 'soft' },
+      h2:       { type:'h1', text:'right.', align:'left', family: 'Cormorant Garamond', weight: '600', caps: false, size: 60, tracking: 0, color: '#FFCA28', shadow: 'soft' },
+      h3:       { type:'tagline', text:'BALANCED. DELICIOUS.\nMADE FOR YOU.', align:'left', family: 'Inter', weight: '400', caps: true, size: 12, tracking: 3, color: '#FFCA28', shadow: 'soft' },
+      h4:       { type:'artSub', text:'Simple ingredients.\nreal goodness', align:'left', size: 30, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
+      tagline:  { type:'tagline', text:'FIT PROTEIN\nSMOOTHIE', align:'left', family: 'Inter', weight: '400', caps: true, size: 12, tracking: 2, color: '#FFFFFF', shadow: 'soft' },
+      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
+      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
+    }),
+  },
 ];
 
 // ─── Initial State Factory ─────────────────────────────────────────
@@ -222,6 +273,20 @@ function makeInitialState() {
         defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686748408-royal_feast_hero.jpg?alt=media';
       } else if (t.id === 't7') {
         defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783725626395-breakfast_hero.jpg?alt=media';
+      } else if (t.id === 't8') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726769651-t8_hero.jpg?alt=media';
+      } else if (t.id === 't9') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726771663-t9_hero.jpg?alt=media';
+      } else if (t.id === 't10') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726774242-t10_hero.jpg?alt=media';
+      } else if (t.id === 't11') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727625330-t11_hero.jpg?alt=media';
+      } else if (t.id === 't12') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727628101-t12_hero.jpg?alt=media';
+      } else if (t.id === 't13') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727629778-t13_hero.jpg?alt=media';
+      } else if (t.id === 't14') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727631759-t14_hero.jpg?alt=media';
       }
 
       return {
@@ -321,6 +386,14 @@ function reducer(state, action) {
           defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726771663-t9_hero.jpg?alt=media';
         } else if (t.id === 't10') {
           defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726774242-t10_hero.jpg?alt=media';
+        } else if (t.id === 't11') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727625330-t11_hero.jpg?alt=media';
+        } else if (t.id === 't12') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727628101-t12_hero.jpg?alt=media';
+        } else if (t.id === 't13') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727629778-t13_hero.jpg?alt=media';
+        } else if (t.id === 't14') {
+          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727631759-t14_hero.jpg?alt=media';
         }
         let updatedZones = { ...t.zones };
         if (updatedZones.phone && theme.phone !== undefined) updatedZones.phone = { ...updatedZones.phone, text: theme.phone };
