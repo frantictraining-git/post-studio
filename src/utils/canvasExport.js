@@ -232,11 +232,7 @@ async function generateCanvas(activeTpl, brandTheme, targetWidth) {
   const { hero } = activeTpl;
   if (hero && hero.url) {
     try {
-      let finalHeroUrl = hero.url;
-      if (finalHeroUrl && finalHeroUrl.includes('firebasestorage.googleapis.com')) {
-        finalHeroUrl = 'https://corsproxy.io/?' + encodeURIComponent(finalHeroUrl);
-      }
-      const img = await loadImage(finalHeroUrl);
+      const img = await loadImage(hero.url);
       ctx.save();
       
       if (isArch) {
@@ -361,11 +357,7 @@ async function generateCanvas(activeTpl, brandTheme, targetWidth) {
   const { fg } = activeTpl;
   if (fg && fg.url) {
     try {
-      let finalFgUrl = fg.url;
-      if (finalFgUrl && finalFgUrl.includes('firebasestorage.googleapis.com')) {
-        finalFgUrl = 'https://corsproxy.io/?' + encodeURIComponent(finalFgUrl);
-      }
-      const img = await loadImage(finalFgUrl);
+      const img = await loadImage(fg.url);
       ctx.save();
       ctx.globalCompositeOperation = fg.blendMode || 'normal';
       ctx.globalAlpha = (fg.opacity ?? 100) / 100;
@@ -390,8 +382,6 @@ async function generateCanvas(activeTpl, brandTheme, targetWidth) {
       let finalLogoUrl = logo.url;
       if (finalLogoUrl.includes('1783726767818-dummy_logo.jpg')) {
         finalLogoUrl = '/dummy_logo.jpg';
-      } else if (finalLogoUrl.includes('firebasestorage.googleapis.com')) {
-        finalLogoUrl = 'https://corsproxy.io/?' + encodeURIComponent(finalLogoUrl);
       }
       const img = await loadImage(finalLogoUrl);
       ctx.save();
