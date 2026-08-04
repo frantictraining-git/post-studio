@@ -478,6 +478,20 @@ export default function ControlPanel({
                     </div>
                     <input type="range" min="0.1" max="3" step="0.05" value={logo.scale} onChange={(e) => setLogo({ scale: Number(e.target.value) })} />
                   </div>
+                  <div className="cp-group">
+                    <div className="cp-row">
+                      <label className="cp-label">Position X</label>
+                      <span className="cp-val">{logo.x?.toFixed(1)}%</span>
+                    </div>
+                    <input type="range" min="0" max="100" step="0.5" value={logo.x || 50} onChange={(e) => setLogo({ x: Number(e.target.value) })} />
+                  </div>
+                  <div className="cp-group">
+                    <div className="cp-row">
+                      <label className="cp-label">Position Y</label>
+                      <span className="cp-val">{logo.y?.toFixed(1)}%</span>
+                    </div>
+                    <input type="range" min="0" max="100" step="0.5" value={logo.y || 50} onChange={(e) => setLogo({ y: Number(e.target.value) })} />
+                  </div>
                 </>
               )}
             </div>
