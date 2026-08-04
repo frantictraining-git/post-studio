@@ -26,21 +26,8 @@ import { OVERLAYS, getOverlayById } from '../assets/overlays';
 
 // ─── Default Zone Styles (per-zone type) ──────────────────────────
 const zoneDefaults = {
-  eyebrow:   { family: 'Cinzel', size: 18, weight: '600', italic: false, caps: true,  color: '#F3F8F1', align: 'center', tracking: 3,  shadow: 'soft', visible: true },
-  ornament:  { family: 'Inter', size: 36, weight: '400', italic: false, caps: false, color: '#A28242', align: 'center', tracking: 0,  shadow: 'none', visible: true },
-  brandSub:  { family: 'Poppins', size: 9,  weight: '300', italic: false, caps: true,  color: '#AF9B78', align: 'center', tracking: 4,  shadow: 'none', visible: true },
-  h1:        { family: 'Minal',   size: 62, weight: '400', italic: false, caps: false, color: '#F3F8F1', align: 'right',  tracking: 1,  shadow: 'soft', visible: true },
-  h2:        { family: 'Montserrat', size: 24, weight: '300', italic: false, caps: true,  color: '#F3F8F1', align: 'right',  tracking: 3,  shadow: 'soft', visible: true },
-  tagline:   { family: 'Cormorant Garamond', size: 20, weight: '300', italic: true, caps: false, color: '#F3F8F1', align: 'right',  tracking: 1,  shadow: 'soft', visible: true },
-  footer:    { family: 'Poppins', size: 12, weight: '400', italic: false, caps: false, color: '#F3F8F1', align: 'center', tracking: 5,  shadow: 'none', visible: true },
-  handle:    { family: 'Poppins', size: 11, weight: '300', italic: false, caps: false, color: '#F3F8F1', align: 'left',   tracking: 0,  shadow: 'none', visible: true },
-  gold:      { family: 'Cinzel', size: 72, weight: '700', italic: false, caps: true,  color: '#A28242', align: 'center', tracking: 4,  shadow: 'glow', visible: true },
-  goldSub:   { family: 'Cormorant Garamond', size: 30, weight: '300', italic: false, caps: true, color: '#A28242', align: 'center', tracking: 12, shadow: 'none', visible: true },
-  verse:     { family: 'Minal',  size: 52, weight: '400', italic: false, caps: false, color: '#F3F8F1', align: 'right',  tracking: 1,  shadow: 'soft', visible: true },
-  verseSub:  { family: 'Montserrat', size: 15, weight: '500', italic: false, caps: true, color: '#F3F8F1', align: 'right', tracking: 8, shadow: 'soft', visible: true },
-  artisan:   { family: 'Minal',  size: 80, weight: '400', italic: false, caps: false, color: '#F3F8F1', align: 'center', tracking: 1,  shadow: 'hard', visible: true },
-  artSub:    { family: 'Cormorant Garamond', size: 30, weight: '300', italic: true, caps: false, color: '#F3F8F1', align: 'center', tracking: 1, shadow: 'hard', visible: true },
-  contactInfo: { family: 'Inter', size: 14, weight: '400', italic: false, caps: false, color: '#F3F8F1', align: 'left', tracking: 1, shadow: 'soft', visible: true },
+  heading:    { family: 'Minal',      size: 32, weight: '400', italic: false, caps: false, color: '#FFFFFF', align: 'center', tracking: 1, shadow: 'soft', visible: true,  x: 50, y: 47 },
+  subheading: { family: 'Montserrat', size: 12, weight: '300', italic: false, caps: true,  color: '#FFFFFF', align: 'center', tracking: 3, shadow: 'soft', visible: true,  x: 50, y: 55 },
 };
 
 // ─── Template Definitions ──────────────────────────────────────────
@@ -51,180 +38,57 @@ const makeZones = (overrides = {}) =>
   }, {});
 
 const TEMPLATE_DEFAULTS = [
-  // T1: Dish Spotlight
   {
-    id: 't1', label: 'Dish Spotlight', icon: '🍽', category: 'Editorial',
-    defaultGrade: { preset: 'none', intensity: 0 },
+    id: 'base', label: 'Base Canvas', icon: '🎨', category: 'Base',
+    defaultOverlay: 'dark-fade',
     zones: makeZones({
-      ornament: { type:'ornament', text:'✦' },
-      eyebrow:  { type:'eyebrow', text:'Fine Dining Experience' },
-      brandSub: { type:'brandSub',  text:'Fine Dining · Halal', align:'center' },
-      h1:       { type:'h1',        text:'Lamb Shank', align:'right' },
-      h2:       { type:'h2',        text:'Slow Braised', align:'right', size: 24, weight: 300 },
-      tagline:  { type:'tagline',   text:'A quiet indulgence, served with grace.' },
-      footer:   { type:'footer',    text:'easteatery.com · @easteateryofficial' },
+      heading: { type: 'heading', text: 'YOUR HEADING' },
+      subheading: { type: 'subheading', text: 'Your sub heading text goes here' },
     }),
-  },
-  // T2: Royal Statement
-  {
-    id: 't2', label: 'Royal Statement', icon: '✦', category: 'Editorial',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      pre:      { type:'goldSub',   text:'A', align:'center', size:36 },
-      h1:       { type:'gold',      text:'Royal', align:'center' },
-      h2:       { type:'gold',      text:'Feast', align:'center' },
-    }),
-  },
-  // T3: Ambient Mood
-  {
-    id: 't3', label: 'Ambient Mood', icon: '🌿', category: 'Arch',
-    defaultGrade: { preset: 'green', intensity: 38, blend: 'multiply' },
-    zones: makeZones({
-      handle:   { type:'handle',    text:'@easteateryofficial' },
-      eyebrow:  { type:'eyebrow', text:'Fine Dining Experience', size:11, align:'right' },
-      h1:       { type:'h1',        text:'Expertise & Mastery', align:'center', size:28, family:'Montserrat', weight:'700', caps:true, italic:false, tracking:8 },
-      tagline:  { type:'tagline',   text:'We serve this deeply.', align:'center', size:18 },
-    }),
-  },
-  // T4: Floating Verse
-  {
-    id: 't4', label: 'Floating Verse', icon: '🎶', category: 'Arch',
-    defaultGrade: { preset: 'green', intensity: 30, blend: 'multiply' },
-    zones: makeZones({
-      handle:   { type:'handle',    text:'@easteateryofficial' },
-      eyebrow:  { type:'eyebrow', text:'Fine Dining Experience', size:11, align:'right' },
-      h1:       { type:'verse',     text:'A Symphony of Flavours' },
-      h2:       { type:'verseSub',  text:'Playing softly on your palate' },
-      tagline:  { type:'tagline',   text:'The Affordable Luxury Dining', size:15, caps:true, tracking:4 },
-    }),
-  },
-  // T5: Artisan Frame
-  {
-    id: 't5', label: 'Artisan Frame', icon: '🔥', category: 'Arch',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      eyebrow:  { type:'eyebrow', text:'Fine Dining Experience', align:'left', size:22, family:'Cormorant Garamond', weight:'300', caps:false },
-      brandSub: { type:'brandSub',  text:'Fine Dining · Slough', align:'left' },
-      h1:       { type:'artisan',   text:'Crafting' },
-      h2:       { type:'artSub',    text:'Taste with Love', size:34 },
-    }),
-  },
-  // T6: Royal Feast
-  {
-    id: 't6', label: 'Royal Feast', icon: '✨', category: 'Classic',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      pre:      { type:'goldSub',   text:'A', align:'center', size:36, family: 'Cormorant Garamond' },
-      h1:       { type:'gold',      text:'Royal', align:'center', family: 'Minal', size: 90, tracking: 0 },
-      h2:       { type:'gold',      text:'Feast', align:'center', family: 'Cinzel', size: 60, tracking: 8 },
-    }),
-  },
-  // T7: Breakfast Bliss
-  {
-    id: 't7', label: 'Breakfast Bliss', icon: '🍳', category: 'Editorial',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      eyebrow:  { type:'artSub', text:'tasty', align:'center', size: 60, color: '#fff', family: 'Playfair Display', tracking: 0, weight: '500' },
-      h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 90, tracking: -3, color: '#fff', shadow: 'soft' },
-      h2:       { type:'artSub', text:'joy', align:'center', size: 60, color: '#fff', family: 'Playfair Display', tracking: 0, weight: '500' },
-      tagline:  { type:'tagline', text:'Creamy eggs, toasted sourdough, simple perfection.', align: 'center', size: 16, color: '#fff', italic: false, family: 'Inter', weight: '300' },
-      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
-      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
-    }),
-  },
-  // T8: Brunch Bliss
-  {
-    id: 't8', label: 'Brunch Bliss', icon: '🥞', category: 'Glassmorphism',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      h2:       { type:'artSub', text:'golden', align:'center', size: 60, color: '#A28242', family: 'Great Vibes', tracking: 0, weight: '400' },
-      h1:       { type:'h1', text:'BRUNCH', align:'center', family: 'Inter', weight: '900', caps: true, size: 100, tracking: -2, color: '#F3F8F1', shadow: 'soft' },
-      h3:       { type:'artSub', text:'bliss', align:'center', size: 60, color: '#A28242', family: 'Great Vibes', tracking: 0, weight: '400' },
-      tagline:  { type:'tagline', text:'Golden pancakes, drizzled with honey butter love.', align: 'left', size: 14, color: '#fff', italic: false, family: 'Inter', weight: '300' },
-      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
-      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
-    }),
-  },
-  // T9: Morning Mood
-  {
-    id: 't9', label: 'Morning Mood', icon: '🍓', category: 'Classic',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 120, tracking: -5, color: '#E53935', shadow: 'hard' },
-      tagline:  { type:'h1', text:'FLIP YOUR MOOD', align:'center', family: 'Inter', weight: '300', caps: true, size: 24, tracking: 8, color: '#FFCA28', shadow: 'soft' },
-      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
-      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
-    }),
-  },
-  // T10: Perfect Harmony
-  {
-    id: 't10', label: 'Perfect Harmony', icon: '🍽️', category: 'Glassmorphism',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      eyebrow:  { type:'tagline', text:'YOUR PRESENTS', align:'center', family: 'Inter', weight: '300', caps: true, size: 14, tracking: 4, color: '#fff' },
-      h2:       { type:'artSub', text:'Perfect', align:'center', size: 70, color: '#A28242', family: 'Great Vibes', tracking: 0, weight: '400' },
-      h1:       { type:'h1', text:'HARMONY', align:'center', family: 'Minal', weight: '400', caps: true, size: 80, tracking: 2, color: '#F3F8F1', shadow: 'soft' },
-      tagline:  { type:'tagline', text:'From the first bite to the final note, our cuisine balances texture, aroma, and taste.', align: 'center', size: 12, color: '#fff', italic: false, family: 'Inter', weight: '300' },
-      website:  { type:'tagline', text:'WWW.EXAMPLE.COM', align: 'center', size: 12, color: '#fff', family: 'Inter', weight: '600', tracking: 4 },
-      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'center' },
-      location: { type:'contactInfo', text:'Slough, Greater London', align: 'center' }
-    }),
-  },
-  // T11: Tasty Morning Joy
-  {
-    id: 't11', label: 'Tasty Morning', icon: '🍳', category: 'Classic',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      h2:       { type:'artSub', text:'tasty', align:'center', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
-      h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 100, tracking: -2, color: '#F3F8F1', shadow: 'soft' },
-      h3:       { type:'artSub', text:'joy', align:'left', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
-      tagline:  { type:'tagline', text:'Creamy eggs,\ntoasted sourdough,\nsimple perfection.', align: 'left', size: 14, color: '#fff', italic: false, family: 'Inter', weight: '400', tracking: 1 },
-      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
-      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
-    }),
-  },
-  // T12: Golden Brunch Bliss
-  {
-    id: 't12', label: 'Golden Brunch', icon: '🥞', category: 'Glassmorphism',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      h2:       { type:'artSub', text:'golden', align:'center', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
-      h1:       { type:'h1', text:'BRUNCH', align:'center', family: 'Inter', weight: '900', caps: true, size: 100, tracking: -2, color: '#F3F8F1', shadow: 'soft' },
-      h3:       { type:'artSub', text:'bliss', align:'left', size: 60, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
-      tagline:  { type:'tagline', text:'Golden pancakes,\ndrizzled with honey\nbutter love.', align: 'left', size: 14, color: '#fff', italic: false, family: 'Inter', weight: '400', tracking: 1 },
-      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
-      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
-    }),
-  },
-  // T13: Morning Mood
-  {
-    id: 't13', label: 'Morning Mood', icon: '🍓', category: 'Editorial',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      h1:       { type:'h1', text:'MORNING', align:'center', family: 'Inter', weight: '900', caps: true, size: 130, tracking: -5, color: '#A01515', shadow: 'none' },
-      tagline:  { type:'h1', text:'FLIP YOUR MOOD', align:'right', family: 'Inter', weight: '200', caps: true, size: 24, tracking: 4, color: '#D4C4A8', shadow: 'soft' },
-      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'right' },
-      location: { type:'contactInfo', text:'Slough, Greater London', align: 'right' }
-    }),
-  },
-  // T14: Fuel Your Morning
-  {
-    id: 't14', label: 'Fuel Your Morning', icon: '🥪', category: 'Arch',
-    defaultGrade: { preset: 'none', intensity: 0 },
-    zones: makeZones({
-      h1:       { type:'h1', text:'Fuel your\nmorning', align:'left', family: 'Cormorant Garamond', weight: '600', caps: false, size: 60, tracking: 0, color: '#FFFFFF', shadow: 'soft' },
-      h2:       { type:'h1', text:'right.', align:'left', family: 'Cormorant Garamond', weight: '600', caps: false, size: 60, tracking: 0, color: '#FFCA28', shadow: 'soft' },
-      h3:       { type:'tagline', text:'BALANCED. DELICIOUS.\nMADE FOR YOU.', align:'left', family: 'Inter', weight: '400', caps: true, size: 12, tracking: 3, color: '#FFCA28', shadow: 'soft' },
-      h4:       { type:'artSub', text:'Simple ingredients.\nreal goodness', align:'left', size: 30, color: '#FFFFFF', family: 'Great Vibes', tracking: 0, weight: '400' },
-      tagline:  { type:'tagline', text:'FIT PROTEIN\nSMOOTHIE', align:'left', family: 'Inter', weight: '400', caps: true, size: 12, tracking: 2, color: '#FFFFFF', shadow: 'soft' },
-      phone:    { type:'contactInfo', text:'+44 1234 567890', align: 'left' },
-      location: { type:'contactInfo', text:'Slough, Greater London', align: 'left' }
-    }),
-  },
+  }
 ];
 
-// ─── Initial State Factory ─────────────────────────────────────────
-function makeInitialState() {
+// ─── Shared Overlay Logic ─────────────────────────────────────────
+export function applyOverlayLogic(template, overlayId, theme, preserveColor = false) {
+  const overlay = getOverlayById(overlayId);
+  const isWhite = overlay.recommended_text_color === 'white';
+  
+  let logoUrl = template.logo?.url;
+  if (!preserveColor || logoUrl === undefined) {
+    logoUrl = isWhite ? theme.logoWhiteUrl : theme.logoColoredUrl;
+    if (!logoUrl) logoUrl = theme.logoWhiteUrl || theme.logoColoredUrl || 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media';
+  }
+
+  const newZones = { ...template.zones };
+  for (const key in newZones) {
+    const zone = newZones[key];
+    
+    let zColor = zone.color;
+    if (!preserveColor || !zone.color) {
+      zColor = isWhite ? '#FFFFFF' : (theme.primaryColor3 || '#000000');
+    }
+    
+    let zFamily = zone.family;
+    if (!preserveColor || !zone.family) {
+      const type = zone.type || key;
+      if (['h1', 'eyebrow', 'brandSub', 'gold', 'verse', 'artisan'].includes(type)) {
+        zFamily = 'var(--primaryFont)';
+      } else if (['h2', 'tagline', 'footer', 'handle', 'contactInfo', 'website', 'social', 'phone', 'location'].includes(type)) {
+        zFamily = 'var(--secondaryFont)';
+      }
+    }
+
+    newZones[key] = { ...zone, color: zColor, family: zFamily };
+  }
+
+  return {
+    ...template,
+    overlay: { id: overlay.id, opacity: template.overlay ? template.overlay.opacity : overlay.default_opacity },
+    logo: { ...template.logo, url: logoUrl },
+    zones: newZones
+  };
+}
+export function makeInitialState() {
   const savedData = localStorage.getItem('postStudioClients');
   let clients = {
     'East Eatery': {
@@ -261,69 +125,36 @@ function makeInitialState() {
     }
   }
 
-  return {
-    activeTemplate: 0,
-    selectedZoneId: null,
+  const initialTheme = clients[activeClient] || clients['East Eatery'];
+
+  const baseState = {
     clients,
     activeClient,
-    brandTheme: {
-      primaryFont: 'Minal',
-      secondaryFont: 'Montserrat',
-      primaryColor1: '#F3F8F1',
-      primaryColor2: '#A28242',
-      primaryColor3: '#000000',
-      secondaryColor1: '#FFFFFF',
-      secondaryColor2: '#DDDDDD',
-      secondaryColor3: '#999999',
-      logoWhiteUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
-      logoColoredUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
-      phone: '+44 1234 567890',
-      email: 'hello@brand.com',
-      webAddress: 'www.brand.com',
-      insta: '@brand',
-      facebook: '',
-      youtube: '',
-      tiktok: '',
-      tagline: 'Your daily dose of inspiration',
-      location: 'Slough, Greater London'
-    },
-    hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false },
+    activeTemplate: 0,
+    selectedZoneId: null,
+    brandTheme: initialTheme,
+    hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false },
     fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
     logo: { url: null, scale: 0.3, x: 50, y: 15 },
     overlay: { id: 'none', opacity: 100 },
     templates: TEMPLATE_DEFAULTS.map(t => {
-      // Set the generated hero image exclusively for T6 and T7
       let defaultHeroUrl = null;
-      if (t.id === 't6') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686748408-royal_feast_hero.jpg?alt=media';
-      } else if (t.id === 't7') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783725626395-breakfast_hero.jpg?alt=media';
-      } else if (t.id === 't8') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726769651-t8_hero.jpg?alt=media';
-      } else if (t.id === 't9') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726771663-t9_hero.jpg?alt=media';
-      } else if (t.id === 't10') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726774242-t10_hero.jpg?alt=media';
-      } else if (t.id === 't11') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727625330-t11_hero.jpg?alt=media';
-      } else if (t.id === 't12') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727628101-t12_hero.jpg?alt=media';
-      } else if (t.id === 't13') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727629778-t13_hero.jpg?alt=media';
-      } else if (t.id === 't14') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727631759-t14_hero.jpg?alt=media';
-      }
-
-      return {
+      const baseT = {
         ...t,
-        hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false },
+        hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false },
         fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
         logo: { url: null, scale: 0.3, x: 50, y: 15 },
         overlay: { id: t.defaultOverlay || 'none', opacity: 100 },
         zones: JSON.parse(JSON.stringify(t.zones)),
       };
+      return applyOverlayLogic(baseT, baseT.overlay.id, initialTheme, true);
     }),
+    snapEnabled: true,
+    // Project tracking
+    currentProjectId: null,
+    currentProjectName: null,
   };
+  return baseState;
 }
 
 // ─── Reducer ──────────────────────────────────────────────────────
@@ -335,41 +166,6 @@ function reducer(state, action) {
     const templates = [...state.templates];
     templates[tIdx] = { ...templates[tIdx], ...updates };
     return { ...state, templates };
-  };
-
-  const applyOverlayLogic = (template, overlayId, theme) => {
-    const overlay = getOverlayById(overlayId);
-    const isWhite = overlay.recommended_text_color === 'white';
-    const textColor = isWhite ? '#FFFFFF' : (theme.primaryColor3 || '#000000');
-    // Fallback logic: if only one logo is uploaded, use it.
-    let logoUrl = isWhite ? theme.logoWhiteUrl : theme.logoColoredUrl;
-    if (!logoUrl) logoUrl = theme.logoWhiteUrl || theme.logoColoredUrl || 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media';
-
-    const newZones = { ...template.zones };
-    for (const key in newZones) {
-      const zone = newZones[key];
-      // Auto-color logic based on overlay legibility
-      const zColor = isWhite ? '#FFFFFF' : (theme.primaryColor3 || '#000000');
-      
-      // Font inheritance logic
-      let zFamily = zone.family;
-      const type = zone.type || key;
-      if (['h1', 'eyebrow', 'brandSub', 'gold', 'verse', 'artisan'].includes(type)) {
-        zFamily = 'var(--primaryFont)';
-      } else if (['h2', 'tagline', 'footer', 'handle', 'contactInfo', 'website', 'social', 'phone', 'location'].includes(type)) {
-        zFamily = 'var(--secondaryFont)';
-      }
-      // 'artSub' and other script/accent types keep their inherent template fonts
-
-      newZones[key] = { ...zone, color: zColor, family: zFamily };
-    }
-
-    return {
-      ...template,
-      overlay: { id: overlay.id, opacity: template.overlay ? template.overlay.opacity : overlay.default_opacity },
-      logo: { ...template.logo, url: logoUrl },
-      zones: newZones
-    };
   };
 
   switch (type) {
@@ -385,9 +181,33 @@ function reducer(state, action) {
     case 'SET_SELECTED_ZONE':
       return { ...state, selectedZoneId: payload };
 
+    case 'LOAD_PROJECT': {
+      // Restore a saved project's full template state
+      const { projectId, projectName, templateState } = payload;
+      const tpl = state.templates[tIdx];
+      const restored = {
+        ...tpl,
+        hero:    templateState.hero    || tpl.hero,
+        fg:      templateState.fg      || tpl.fg,
+        logo:    templateState.logo    || tpl.logo,
+        overlay: templateState.overlay || tpl.overlay,
+        zones:   templateState.zones   || tpl.zones,
+        category: templateState.category || tpl.category,
+      };
+      const templates = [...state.templates];
+      templates[tIdx] = restored;
+      return { ...state, templates, currentProjectId: projectId, currentProjectName: projectName };
+    }
+
+    case 'SET_CURRENT_PROJECT':
+      return { ...state, currentProjectId: payload.id, currentProjectName: payload.name };
+
+    case 'TOGGLE_SNAP':
+      return { ...state, snapEnabled: !state.snapEnabled };
+
     case 'SET_BRAND_THEME': {
       const newTheme = { ...state.brandTheme, ...payload };
-      let updatedTemplates = state.templates.map(t => applyOverlayLogic(t, t.overlay.id, newTheme));
+      let updatedTemplates = state.templates.map(t => applyOverlayLogic(t, t.overlay.id, newTheme, true));
       return { ...state, brandTheme: newTheme, templates: updatedTemplates };
     }
 
@@ -459,7 +279,7 @@ function reducer(state, action) {
           zones: updatedZones
         };
         
-        return applyOverlayLogic(tempT, tempT.overlay.id, theme);
+        return applyOverlayLogic(tempT, tempT.overlay.id, theme, true);
       });
       
       return {
@@ -484,7 +304,7 @@ function reducer(state, action) {
       const newOverlay = { ...state.templates[tIdx].overlay, ...payload };
       let newT = { ...state.templates[tIdx], overlay: newOverlay };
       if (payload.id) {
-        newT = applyOverlayLogic(newT, payload.id, state.brandTheme);
+        newT = applyOverlayLogic(newT, payload.id, state.brandTheme, true);
         // Ensure opacity resets if a new ID is picked
         newT.overlay.opacity = getOverlayById(payload.id).default_opacity;
       }
@@ -572,6 +392,15 @@ export function useStudio() {
   const setZoneStyle = useCallback((zoneId, style) =>
     dispatch({ type: 'SET_ZONE_STYLE', payload: { zoneId, style } }), []);
 
+  const toggleSnap = useCallback(() =>
+    dispatch({ type: 'TOGGLE_SNAP' }), []);
+
+  const loadProject = useCallback((projectId, projectName, templateState) =>
+    dispatch({ type: 'LOAD_PROJECT', payload: { projectId, projectName, templateState } }), []);
+
+  const setCurrentProject = useCallback((id, name) =>
+    dispatch({ type: 'SET_CURRENT_PROJECT', payload: { id, name } }), []);
+
   const activeTpl = state.templates[state.activeTemplate];
 
   return {
@@ -589,6 +418,9 @@ export function useStudio() {
     setOverlay,
     setZoneText,
     setZoneStyle,
+    toggleSnap,
+    loadProject,
+    setCurrentProject,
     TEMPLATE_DEFAULTS,
   };
 }

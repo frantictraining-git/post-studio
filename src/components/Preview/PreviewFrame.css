@@ -146,19 +146,13 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background-image: 
-    linear-gradient(45deg, var(--ui-panel) 25%, transparent 25%), 
-    linear-gradient(-45deg, var(--ui-panel) 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, var(--ui-panel) 75%), 
-    linear-gradient(-45deg, transparent 75%, var(--ui-panel) 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background: #1a1a1a;
 }
 
 .pv-frame {
   width: 432px;
   height: 540px;
-  background: #000;
+  background: #e6dfd1; /* Light brown / handmade paper color */
   position: relative;
   box-shadow: 0 24px 64px rgba(0,0,0,0.5);
   border: 1px solid rgba(255,255,255,0.05);
@@ -173,4 +167,79 @@
   margin-top: 24px;
   font-size: 12px;
   color: var(--ui-text-muted);
+}
+
+/* ── Toolbar Buttons ─── */
+.pv-export-btn,
+.pv-save-btn,
+.pv-projects-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+}
+
+.pv-export-btn {
+  background: linear-gradient(135deg, #a28242, #c9a455);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(162, 130, 66, 0.35);
+}
+.pv-export-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b8944d, #d4b060);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(162, 130, 66, 0.5);
+}
+.pv-export-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.pv-save-btn {
+  background: rgba(162, 130, 66, 0.15);
+  color: #a28242;
+  border: 1px solid rgba(162, 130, 66, 0.4);
+}
+.pv-save-btn:hover {
+  background: rgba(162, 130, 66, 0.25);
+  border-color: #a28242;
+  color: #c9a455;
+}
+
+.pv-projects-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(240, 232, 208, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.pv-projects-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(240, 232, 208, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Project status bar ─── */
+.pv-project-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.pv-project-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(240, 232, 208, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.pv-save-status {
+  font-size: 11px;
+  white-space: nowrap;
+  transition: color 0.3s;
 }

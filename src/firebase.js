@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,3 +18,8 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Storage and Firestore
 export const storage = getStorage(app);
 export const db = getFirestore(app);
+
+// Enable offline persistence so it doesn't crash on refresh/brief network drops
+enableIndexedDbPersistence(db).catch((err) => {
+  console.warn("Firebase offline persistence failed:", err.code);
+});

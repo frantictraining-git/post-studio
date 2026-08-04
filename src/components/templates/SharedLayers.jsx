@@ -1,4 +1,5 @@
 import React from 'react';
+import TransformGizmo from './TransformGizmo';
 
 // Helper to convert zone style object to inline CSS for preview
 export const toCSS = (zone) => {
@@ -16,11 +17,12 @@ export const toCSS = (zone) => {
 
   return {
     fontFamily: `"${fontFamily}", sans-serif`,
-    fontSize: `${zone.size}px`,
+    fontSize: `${zone.size * (zone.scale || 1)}px`,
     fontWeight: zone.weight,
     fontStyle: zone.italic ? 'italic' : 'normal',
-    textTransform: zone.caps ? 'uppercase' : 'none',
-    color: zone.color,
+    textTransform: (zone.transform === 'small-caps' || zone.transform === 'sentence-case') ? 'none' : (zone.transform || (zone.caps ? 'uppercase' : 'none')),
+    fontVariant: zone.transform === 'small-caps' ? 'small-caps' : 'normal',
+    color: zone.color || '#ffffff',
     textAlign: zone.align,
     letterSpacing: `${zone.tracking || 0}px`,
     marginRight: `-${zone.tracking || 0}px`, // Compensate for trailing letter-spacing to fix alignment
@@ -28,13 +30,12 @@ export const toCSS = (zone) => {
   };
 };
 
-export function TextZone({ id, zone, className, selectedZoneId, onSelect, onTextChange, styleOverrides = {}, maxWidth, as: Component = 'div' }) {
+export function TextZone({ id, zone, className, selectedZoneId, onSelect, onTextChange, setZoneStyle, styleOverrides = {}, maxWidth, snapEnabled, as: Component = 'div' }) {
   const ref = React.useRef(null);
   const [scaleFactor, setScaleFactor] = React.useState(1);
   
   React.useLayoutEffect(() => {
     if (ref.current && !ref.current.isContentEditable) {
-      // temporarily remove scale to measure natural width
       ref.current.style.transform = 'none';
       const nativeW = ref.current.scrollWidth;
       const maxW = ref.current.parentElement.clientWidth;
@@ -45,7 +46,7 @@ export function TextZone({ id, zone, className, selectedZoneId, onSelect, onText
         setScaleFactor(1);
       }
     }
-  }, [zone.text, zone.size, zone.family, zone.weight, zone.tracking, zone.caps, maxWidth]);
+  }, [zone.text, zone.size, zone.family, zone.weight, zone.tracking, zone.caps, zone.transform, maxWidth]);
 
   if (!zone || zone.visible === false) return null;
 
@@ -54,41 +55,70 @@ export function TextZone({ id, zone, className, selectedZoneId, onSelect, onText
   
   const isEditing = ref.current && ref.current.isContentEditable;
   
-  // Wrapper provides the stable outline and takes up layout space.
+  // The UI frame is 432x540px (before 1.25x CSS scale).
+  // We convert drag pixels to percentages so the coordinate system matches canvasExport.
+  const FRAME_W = 432;
+  const FRAME_H = 540;
+
   const wrapperStyle = {
-    outline: isSelected ? '2px solid #00f0ff' : 'none',
-    outlineOffset: '4px',
     cursor: 'pointer',
-    position: 'relative',
-    left: `${zone.x || 0}px`,
-    top: `${zone.y || 0}px`,
+    pointerEvents: 'auto',
     display: Component === 'span' ? 'inline-flex' : 'flex',
     flexDirection: 'column',
-    width: Component === 'span' ? 'auto' : '100%',
+    width: (zone.boxWidth || 0) > 0 ? `${zone.boxWidth}%` : 'max-content',
     alignItems: zone.align === 'right' ? 'flex-end' : zone.align === 'center' ? 'center' : 'flex-start',
-    ...styleOverrides, // marginBottom, padding etc. apply to wrapper
+    // Absolute position using percentage coordinates (same system as canvasExport)
+    // Position props come last so they always win even if styleOverrides tries to override
+    ...styleOverrides,
+    position: 'absolute',
+    left: `${zone.x ?? 50}%`,
+    top: `${zone.y ?? 50}%`,
+    transform: 'translate(-50%, -50%)',
   };
 
-  // Inner holds the text, expands to fit, and gets scaled down if needed.
   const innerStyle = {
     ...baseStyle,
     display: 'block',
-    width: 'max-content',
+    width: (zone.boxWidth || 0) > 0 ? '100%' : 'max-content',
     textAlign: zone.align,
-    whiteSpace: isEditing ? 'pre-wrap' : 'nowrap',
+    whiteSpace: (zone.boxWidth || 0) > 0 ? 'pre-wrap' : 'pre',
+    wordBreak: (zone.boxWidth || 0) > 0 ? 'break-word' : 'normal',
+    userSelect: isEditing ? 'auto' : 'none',
+    WebkitUserSelect: isEditing ? 'auto' : 'none',
     transform: isEditing ? 'none' : `scale(${scaleFactor})`,
     transformOrigin: zone.align === 'right' ? 'right center' : zone.align === 'center' ? 'center center' : 'left center',
   };
 
+  const handleDrag = (dx, dy) => {
+    if (setZoneStyle) setZoneStyle(id, {
+      x: (zone.x ?? 50) + (dx / FRAME_W * 100),
+      y: (zone.y ?? 50) + (dy / FRAME_H * 100),
+    });
+  };
+
+  const handleScale = (ds) => {
+    if (setZoneStyle) setZoneStyle(id, { scale: Math.max(0.1, (zone.scale || 1) + ds) });
+  };
+
+  const handleResizeWidth = (dwPct) => {
+    if (setZoneStyle) {
+      // If currently auto (0), initialize it based on its current rendered width
+      const currentBoxWidth = (zone.boxWidth > 0) ? zone.boxWidth : ((ref.current.getBoundingClientRect().width / FRAME_W) * 100);
+      setZoneStyle(id, { boxWidth: Math.max(10, currentBoxWidth + dwPct) });
+    }
+  };
+
   return (
-    <div 
-      className={`text-zone-wrapper ${className || ''}`}
-      style={wrapperStyle}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect(id);
-      }}
+    <TransformGizmo 
+      isActive={isSelected} 
+      onDrag={handleDrag} 
+      onScale={handleScale} 
+      onResizeWidth={handleResizeWidth}
+      onClick={() => onSelect(id)} 
+      styleOverrides={wrapperStyle}
+      snapEnabled={snapEnabled}
     >
+      <div className={`text-zone-wrapper ${className || ''}`}>
       <Component 
         ref={ref}
         contentEditable={isEditing}
@@ -107,22 +137,23 @@ export function TextZone({ id, zone, className, selectedZoneId, onSelect, onText
           }
         }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
+          if (e.key === 'Escape') {
             e.preventDefault();
             ref.current.blur();
           }
         }}
         style={innerStyle}
       >
-        {zone.text}
+        {zone.transform === 'sentence-case' ? (zone.text?.charAt(0).toUpperCase() + zone.text?.slice(1).toLowerCase()) : zone.text}
       </Component>
-    </div>
+      </div>
+    </TransformGizmo>
   );
 }
 
 import { getOverlayById } from '../../assets/overlays';
 
-export function SharedLayers({ tpl }) {
+export function SharedLayers({ tpl, selectedZoneId, onSelectZone, setLogo, snapEnabled }) {
   const { hero, overlay, category } = tpl;
   
   const activeOverlay = getOverlayById(overlay ? overlay.id : 'none');
@@ -165,6 +196,7 @@ export function SharedLayers({ tpl }) {
               <img 
                 src={hero.url} 
                 className="t-bg-img" 
+                draggable={false}
                 style={{
                   filter: `blur(${hero.blur}px)`,
                   transform: `translate(${hero.x - 50}%, ${hero.y - 50}%) scale(${hero.scale}) ${hero.mirror ? 'scaleX(-1)' : ''}`,
@@ -177,6 +209,7 @@ export function SharedLayers({ tpl }) {
             <img 
               src={hero.url} 
               className="t-bg-img" 
+              draggable={false}
               style={{
                 filter: `blur(${hero.blur}px)`,
                 transform: `translate(${hero.x - 50}%, ${hero.y - 50}%) scale(${hero.scale}) ${hero.mirror ? 'scaleX(-1)' : ''}`,
@@ -234,6 +267,7 @@ export function SharedLayers({ tpl }) {
         <img 
           src={tpl.fg.url} 
           className="t-fg-img" 
+          draggable={false}
           style={{
             position: 'absolute',
             left: `${tpl.fg.x}%`,
@@ -243,7 +277,7 @@ export function SharedLayers({ tpl }) {
             maxHeight: '100%',
             objectFit: 'contain',
             mixBlendMode: tpl.fg.blendMode || 'normal',
-            opacity: tpl.fg.opacity / 100,
+            opacity: (tpl.fg.opacity ?? 100) / 100,
             pointerEvents: 'none'
           }}
           alt="" 
@@ -252,23 +286,49 @@ export function SharedLayers({ tpl }) {
       
       {/* Logo Layer */}
       {tpl.logo && tpl.logo.url && (
-        <img 
-          src={tpl.logo.url} 
-          className="t-logo-img"
-          alt="Logo"
-          style={{
+        <TransformGizmo
+          isActive={selectedZoneId === 'logo'}
+          snapEnabled={snapEnabled}
+          onDrag={(dx, dy) => {
+            // Because logo x/y are percentages in App state, 
+            // we should convert dx/dy into percentage.
+            // But since dx is in pixels, we can approximate:
+            // 1% of 1080px is 10.8px. Let's just scale dx down so it doesn't fly off screen.
+            const newX = tpl.logo.x + (dx * 0.1);
+            const newY = tpl.logo.y + (dy * 0.1);
+            if (setLogo) setLogo({ x: newX, y: newY });
+          }}
+          onScale={(ds) => {
+            if (setLogo) setLogo({ scale: Math.max(0.05, tpl.logo.scale + ds) });
+          }}
+          onClick={() => { if (onSelectZone) onSelectZone('logo'); }}
+          styleOverrides={{
             position: 'absolute',
             left: `${tpl.logo.x}%`,
             top: `${tpl.logo.y}%`,
             transform: `translate(-50%, -50%) scale(${tpl.logo.scale})`,
-            maxWidth: '100%',
-            maxHeight: '100%',
-            objectFit: 'contain',
-            mixBlendMode: tpl.logo.blendMode || 'normal',
-            opacity: tpl.logo.opacity / 100,
-            pointerEvents: 'none'
+            pointerEvents: 'auto'
           }}
-        />
+        >
+          <img 
+            src={tpl.logo.url} 
+            className="t-logo-img" 
+            draggable={false}
+            style={{
+              position: 'relative',
+              maxWidth: '200px',
+              maxHeight: '150px',
+              display: 'block',
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain',
+              mixBlendMode: tpl.logo.blendMode || 'normal',
+              opacity: (tpl.logo.opacity ?? 100) / 100,
+              pointerEvents: 'none'
+            }}
+            alt="" 
+          />
+        </TransformGizmo>
       )}
     </>
   );

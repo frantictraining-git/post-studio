@@ -279,41 +279,57 @@ export default function BrandManagerModal({ isOpen, onClose, state, saveClient, 
                   <label>Brand Logos (Firebase Storage)</label>
                   <p style={{fontSize: 12, color: '#aaa', marginBottom: 8}}>Upload both versions of your logo.</p>
                   
-                  <div style={{ display: 'flex', gap: '15px', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', gap: '15px' }}>
                     {/* White Logo */}
-                    <div style={{ flex: 1, padding: 10, background: '#222', borderRadius: 6 }}>
-                      <label style={{ fontSize: '12px', display: 'block', marginBottom: 8 }}>White Variant (For dark backgrounds)</label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {formData.logoWhiteUrl && (
-                          <div style={{ width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', background: '#000' }}>
-                            <img src={formData.logoWhiteUrl} alt="White Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                          </div>
+                    <div style={{ flex: 1, padding: 15, background: '#1e1e1e', borderRadius: 8, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <label style={{ fontSize: '13px', display: 'block', color: '#fff', fontWeight: 600 }}>White Variant</label>
+                      <p style={{ fontSize: '11px', color: '#aaa', margin: 0 }}>For dark backgrounds</p>
+                      
+                      <div style={{ 
+                        width: '100%', height: '120px', borderRadius: '6px', 
+                        background: '#333', // Dark matte background
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        border: '1px solid #444', overflow: 'hidden'
+                      }}>
+                        {formData.logoWhiteUrl ? (
+                          <img src={formData.logoWhiteUrl} alt="White Logo" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                        ) : (
+                          <span style={{ color: '#666', fontSize: '12px' }}>No Logo</span>
                         )}
-                        <label style={{
-                          display: 'inline-block', padding: '8px 16px', background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '13px', textAlign: 'center', flex: 1
-                        }}>
-                          {uploadState.isUploadingLogoWhite ? `Uploading... ${Math.round(uploadState.uploadProgress)}%` : (formData.logoWhiteUrl ? 'Change White Logo' : 'Upload White Logo')}
-                          <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'white')} style={{ display: 'none' }} disabled={uploadState.isUploadingLogoWhite} />
-                        </label>
                       </div>
+
+                      <label style={{
+                        display: 'block', padding: '10px', background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '13px', textAlign: 'center'
+                      }}>
+                        {uploadState.isUploadingLogoWhite ? `Uploading... ${Math.round(uploadState.uploadProgress)}%` : (formData.logoWhiteUrl ? 'Change White Logo' : 'Upload White Logo')}
+                        <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'white')} style={{ display: 'none' }} disabled={uploadState.isUploadingLogoWhite} />
+                      </label>
                     </div>
 
                     {/* Colored Logo */}
-                    <div style={{ flex: 1, padding: 10, background: '#f5f5f5', borderRadius: 6, color: '#000' }}>
-                      <label style={{ fontSize: '12px', display: 'block', marginBottom: 8, color: '#333' }}>Colored Variant (For light backgrounds)</label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {formData.logoColoredUrl && (
-                          <div style={{ width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', background: '#fff', border: '1px solid #ddd' }}>
-                            <img src={formData.logoColoredUrl} alt="Colored Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                          </div>
+                    <div style={{ flex: 1, padding: 15, background: '#f8f9fa', borderRadius: 8, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <label style={{ fontSize: '13px', display: 'block', color: '#333', fontWeight: 600 }}>Colored Variant</label>
+                      <p style={{ fontSize: '11px', color: '#666', margin: 0 }}>For light backgrounds</p>
+                      
+                      <div style={{ 
+                        width: '100%', height: '120px', borderRadius: '6px', 
+                        background: '#e9ecef', // Light matte background
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        border: '1px solid #dee2e6', overflow: 'hidden'
+                      }}>
+                        {formData.logoColoredUrl ? (
+                          <img src={formData.logoColoredUrl} alt="Colored Logo" style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                        ) : (
+                          <span style={{ color: '#aaa', fontSize: '12px' }}>No Logo</span>
                         )}
-                        <label style={{
-                          display: 'inline-block', padding: '8px 16px', background: 'rgba(0, 0, 0, 0.1)', border: '1px solid rgba(0, 0, 0, 0.2)', borderRadius: '6px', color: '#000', cursor: 'pointer', fontSize: '13px', textAlign: 'center', flex: 1
-                        }}>
-                          {uploadState.isUploadingLogoColored ? `Uploading... ${Math.round(uploadState.uploadProgress)}%` : (formData.logoColoredUrl ? 'Change Colored Logo' : 'Upload Colored Logo')}
-                          <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'colored')} style={{ display: 'none' }} disabled={uploadState.isUploadingLogoColored} />
-                        </label>
                       </div>
+
+                      <label style={{
+                        display: 'block', padding: '10px', background: 'rgba(0, 0, 0, 0.05)', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '6px', color: '#333', cursor: 'pointer', fontSize: '13px', textAlign: 'center'
+                      }}>
+                        {uploadState.isUploadingLogoColored ? `Uploading... ${Math.round(uploadState.uploadProgress)}%` : (formData.logoColoredUrl ? 'Change Colored Logo' : 'Upload Colored Logo')}
+                        <input type="file" accept="image/*" onChange={(e) => handleLogoUpload(e, 'colored')} style={{ display: 'none' }} disabled={uploadState.isUploadingLogoColored} />
+                      </label>
                     </div>
                   </div>
                 </div>

@@ -17,8 +17,12 @@ function ImageUpload({ label, onUpload, onClear, hasImage }) {
           accept="image/*" 
           onChange={(e) => {
             if (e.target.files && e.target.files[0]) {
-              const url = URL.createObjectURL(e.target.files[0]);
-              onUpload(url);
+              const file = e.target.files[0];
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                onUpload(event.target.result);
+              };
+              reader.readAsDataURL(file);
               e.target.value = null;
             }
           }} 
@@ -105,9 +109,31 @@ function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle }) {
           <button className={`btn-sm ${zoneData.align === 'right' ? 'active' : ''}`} onClick={() => onChangeStyle(zoneId, { align: 'right' })}>R</button>
         </div>
         
-        <div className="btn-group" style={{ flex: 1 }}>
-          <button className={`btn-sm ${zoneData.italic ? 'active' : ''}`} onClick={() => onChangeStyle(zoneId, { italic: !zoneData.italic })}>I</button>
-          <button className={`btn-sm ${zoneData.caps ? 'active' : ''}`} onClick={() => onChangeStyle(zoneId, { caps: !zoneData.caps })}>AA</button>
+        <div style={{ flex: 1.5, display: 'flex', gap: '4px', marginLeft: '4px' }}>
+          <button 
+            className={`btn-sm ${zoneData.italic ? 'active' : ''}`} 
+            onClick={() => onChangeStyle(zoneId, { italic: !zoneData.italic })}
+            style={{ padding: '0 10px' }}
+            title="Italic"
+          >
+            I
+          </button>
+          <select 
+            value={zoneData.transform || (zoneData.caps ? 'uppercase' : 'none')}
+            onChange={(e) => {
+              const val = e.target.value;
+              onChangeStyle(zoneId, { transform: val, caps: val === 'uppercase' });
+            }}
+            style={{ flex: 1, padding: '4px' }}
+            title="Text Case"
+          >
+            <option value="none">Normal</option>
+            <option value="sentence-case">Sentence Case</option>
+            <option value="uppercase">UPPER</option>
+            <option value="lowercase">lower</option>
+            <option value="capitalize">Capitalize</option>
+            <option value="small-caps">Small Caps</option>
+          </select>
         </div>
       </div>
 
@@ -139,10 +165,11 @@ export default function ControlPanel({
   saveClient,
   loadClient,
   TEMPLATE_DEFAULTS,
-  onOpenBrandManager
+  onOpenBrandManager,
+  toggleSnap
 }) {
   const { hero, fg, logo, grade, zones } = activeTpl;
-  const { brandTheme, selectedZoneId } = state;
+  const { brandTheme, selectedZoneId, snapEnabled } = state;
   const [clientProfilesExpanded, setClientProfilesExpanded] = React.useState(false);
 
   return (
@@ -153,8 +180,15 @@ export default function ControlPanel({
       </div>
 
       <div className="cp-section">
-        <h2 className="cp-section-title">Template</h2>
-        <div className="tpl-grid">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 className="cp-section-title" style={{ margin: 0 }}>Template</h2>
+          <label className="toggle" title="Snap to Guides" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '11px', color: 'var(--ui-text-muted)' }}>
+            Snap
+            <input type="checkbox" checked={snapEnabled} onChange={toggleSnap} />
+            <div className="toggle-track"></div>
+          </label>
+        </div>
+        <div className="tpl-grid" style={{ marginTop: '12px' }}>
           <div className="tpl-btn active" style={{ cursor: 'default' }}>
             <span className="tpl-icon">{activeTpl.icon}</span>
             {activeTpl.label}
@@ -233,6 +267,13 @@ export default function ControlPanel({
                   <div className="toggle-track"></div>
                 </label>
               </div>
+              <div className="cp-row" style={{ marginTop: 8 }}>
+                <label className="cp-label">Lock Position</label>
+                <label className="toggle">
+                  <input type="checkbox" checked={hero.locked} onChange={(e) => setHero({ locked: e.target.checked })} />
+                  <div className="toggle-track"></div>
+                </label>
+              </div>
             </>
           )}
         </div>
@@ -264,32 +305,6 @@ export default function ControlPanel({
               <span className="cp-val">{state.templates[state.activeTemplate].overlay.opacity}%</span>
             </div>
             <input type="range" min="0" max="100" step="1" value={state.templates[state.activeTemplate].overlay.opacity} onChange={(e) => setOverlay({ opacity: Number(e.target.value) })} />
-          </div>
-        </div>
-
-        {/* Logo Controls */}
-        <div className="cp-section">
-          <h2 className="cp-section-title">Logo Controls</h2>
-          <div className="cp-group">
-            <div className="cp-row">
-              <label className="cp-label">Scale</label>
-              <span className="cp-val">{logo.scale.toFixed(2)}x</span>
-            </div>
-            <input type="range" min="0.1" max="2.0" step="0.05" value={logo.scale} onChange={(e) => setLogo({ scale: Number(e.target.value) })} />
-          </div>
-          <div className="cp-group">
-            <div className="cp-row">
-              <label className="cp-label">X Position</label>
-              <span className="cp-val">{logo.x}%</span>
-            </div>
-            <input type="range" min="0" max="100" step="1" value={logo.x} onChange={(e) => setLogo({ x: Number(e.target.value) })} />
-          </div>
-          <div className="cp-group">
-            <div className="cp-row">
-              <label className="cp-label">Y Position</label>
-              <span className="cp-val">{logo.y}%</span>
-            </div>
-            <input type="range" min="0" max="100" step="1" value={logo.y} onChange={(e) => setLogo({ y: Number(e.target.value) })} />
           </div>
         </div>
 
@@ -349,66 +364,36 @@ export default function ControlPanel({
           )}
         </div>
 
-        {/* Logo Layer */}
-        <div className="cp-section">
-          <h2 className="cp-section-title">Logo Layer</h2>
-          <ImageUpload 
-            label="Logo Element" 
-            hasImage={!!logo?.url}
-            onUpload={(url) => setLogo({ url })}
-            onClear={() => setLogo({ url: null })}
-          />
-          {logo?.url && (
-            <>
-              <div className="cp-group">
-                <div className="cp-row">
-                  <label className="cp-label">Blend Mode</label>
-                </div>
-                <select value={logo.blendMode} onChange={(e) => setLogo({ blendMode: e.target.value })}>
-                  <option value="normal">Normal</option>
-                  <option value="multiply">Multiply</option>
-                  <option value="screen">Screen</option>
-                  <option value="overlay">Overlay</option>
-                  <option value="luminosity">Luminosity</option>
-                  <option value="color">Color</option>
-                </select>
-              </div>
-              <div className="cp-group">
-                <div className="cp-row">
-                  <label className="cp-label">Opacity</label>
-                  <span className="cp-val">{logo.opacity}%</span>
-                </div>
-                <input type="range" min="0" max="100" step="1" value={logo.opacity} onChange={(e) => setLogo({ opacity: Number(e.target.value) })} />
-              </div>
-              <div className="cp-group">
-                <div className="cp-row">
-                  <label className="cp-label">Scale</label>
-                  <span className="cp-val">{logo.scale.toFixed(2)}x</span>
-                </div>
-                <input type="range" min="0.1" max="3" step="0.05" value={logo.scale} onChange={(e) => setLogo({ scale: Number(e.target.value) })} />
-              </div>
-              <div className="cp-group">
-                <div className="cp-row">
-                  <label className="cp-label">Position X</label>
-                  <span className="cp-val">{logo.x.toFixed(0)}%</span>
-                </div>
-                <input type="range" min="-200" max="300" step="1" value={logo.x} onChange={(e) => setLogo({ x: Number(e.target.value) })} />
-              </div>
-              <div className="cp-group">
-                <div className="cp-row">
-                  <label className="cp-label">Position Y</label>
-                  <span className="cp-val">{logo.y.toFixed(0)}%</span>
-                </div>
-                <input type="range" min="-200" max="300" step="1" value={logo.y} onChange={(e) => setLogo({ y: Number(e.target.value) })} />
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Text Zones */}
+        {/* Unified Layers */}
         <div className="cp-section">
           <h2 className="cp-section-title">Template Layers</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
+            <div 
+              onClick={() => setSelectedZoneId('logo')}
+              style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '8px 12px', background: selectedZoneId === 'logo' ? 'rgba(0, 240, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                border: selectedZoneId === 'logo' ? '1px solid #00f0ff' : '1px solid transparent',
+                borderRadius: '6px', cursor: 'pointer', fontSize: '13px'
+              }}
+            >
+              <span style={{ fontWeight: selectedZoneId === 'logo' ? 600 : 400, color: '#fff' }}>
+                LOGO
+              </span>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLogo({ url: logo?.url ? null : brandTheme.logoWhiteUrl });
+                }}
+                style={{
+                  background: 'none', border: 'none', color: logo?.url ? '#fff' : '#666',
+                  cursor: 'pointer', fontSize: '14px', padding: 0
+                }}
+              >
+                {logo?.url ? '👁' : '🚫'}
+              </button>
+            </div>
+            
             {Object.entries(zones).map(([zId, zData]) => (
               <div 
                 key={zId}
@@ -439,10 +424,62 @@ export default function ControlPanel({
             ))}
           </div>
 
-          <h2 className="cp-section-title">Text Properties</h2>
+          <h2 className="cp-section-title">Layer Properties</h2>
           {!selectedZoneId ? (
             <div style={{ padding: '16px', background: 'rgba(0,0,0,0.2)', borderRadius: '8px', textAlign: 'center', fontSize: '12px', color: '#888' }}>
               Select a layer above or click text on the image to edit.
+            </div>
+          ) : selectedZoneId === 'logo' ? (
+            <div style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+              <div className="cp-group">
+                <div className="cp-row">
+                  <label className="cp-label">Select Logo from Profile</label>
+                </div>
+                <select 
+                  value={logo?.url === brandTheme.logoWhiteUrl ? 'white' : (logo?.url === brandTheme.logoColoredUrl ? 'colored' : 'none')} 
+                  onChange={(e) => {
+                    if (e.target.value === 'white') setLogo({ url: brandTheme.logoWhiteUrl });
+                    else if (e.target.value === 'colored') setLogo({ url: brandTheme.logoColoredUrl });
+                    else setLogo({ url: null });
+                  }}
+                  style={{ width: '100%', marginBottom: '8px' }}
+                >
+                  <option value="none">No Logo</option>
+                  {brandTheme.logoWhiteUrl && <option value="white">White Logo</option>}
+                  {brandTheme.logoColoredUrl && <option value="colored">Colored Logo</option>}
+                </select>
+              </div>
+              {logo?.url && (
+                <>
+                  <div className="cp-group">
+                    <div className="cp-row">
+                      <label className="cp-label">Blend Mode</label>
+                    </div>
+                    <select value={logo.blendMode} onChange={(e) => setLogo({ blendMode: e.target.value })}>
+                      <option value="normal">Normal</option>
+                      <option value="multiply">Multiply</option>
+                      <option value="screen">Screen</option>
+                      <option value="overlay">Overlay</option>
+                      <option value="luminosity">Luminosity</option>
+                      <option value="color">Color</option>
+                    </select>
+                  </div>
+                  <div className="cp-group">
+                    <div className="cp-row">
+                      <label className="cp-label">Opacity</label>
+                      <span className="cp-val">{logo.opacity}%</span>
+                    </div>
+                    <input type="range" min="0" max="100" step="1" value={logo.opacity} onChange={(e) => setLogo({ opacity: Number(e.target.value) })} />
+                  </div>
+                  <div className="cp-group">
+                    <div className="cp-row">
+                      <label className="cp-label">Scale</label>
+                      <span className="cp-val">{logo.scale?.toFixed(2)}x</span>
+                    </div>
+                    <input type="range" min="0.1" max="3" step="0.05" value={logo.scale} onChange={(e) => setLogo({ scale: Number(e.target.value) })} />
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             zones[selectedZoneId] ? (
@@ -456,6 +493,7 @@ export default function ControlPanel({
             ) : (
               <div style={{ fontSize: '12px', color: '#888' }}>Zone not available in this template.</div>
             )
+
           )}
         </div>
 

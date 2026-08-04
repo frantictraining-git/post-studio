@@ -30,14 +30,10 @@ export default function NotesWidget() {
     }
 
     setIsSaving(true);
-    timeoutRef.current = setTimeout(async () => {
-      try {
-        await setDoc(docRef, { text: val }, { merge: true });
-      } catch (err) {
-        console.error("Error saving note:", err);
-      } finally {
-        setIsSaving(false);
-      }
+    timeoutRef.current = setTimeout(() => {
+      // Don't await setDoc — it finishes instantly locally
+      setDoc(docRef, { text: val }, { merge: true }).catch(err => console.warn('Note save sync delayed:', err));
+      setIsSaving(false);
     }, 1000); // 1 second debounce
   };
 

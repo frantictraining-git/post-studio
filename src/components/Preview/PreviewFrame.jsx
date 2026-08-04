@@ -1,61 +1,71 @@
 import React, { useRef, useState } from 'react';
 import './PreviewFrame.css';
-import T1_DishSpotlight from '../templates/T1_DishSpotlight';
-import T2_RoyalStatement from '../templates/T2_RoyalStatement';
-import T3_AmbientMood from '../templates/T3_AmbientMood';
-import T4_FloatingVerse from '../templates/T4_FloatingVerse';
-import T5_ArtisanFrame from '../templates/T5_ArtisanFrame';
-import T6_RoyalFeast from '../templates/T6_RoyalFeast';
-import T7_BreakfastBliss from '../templates/T7_BreakfastBliss';
-import T8_BrunchBliss from '../templates/T8_BrunchBliss';
-import T9_MorningMood from '../templates/T9_MorningMood';
-import T10_PerfectHarmony from '../templates/T10_PerfectHarmony';
-import T11_TastyMorning from '../templates/T11_TastyMorning';
-import T12_GoldenBrunch from '../templates/T12_GoldenBrunch';
-import T13_MorningMood from '../templates/T13_MorningMood';
-import T14_FuelYourMorning from '../templates/T14_FuelYourMorning';
-import { exportToPNG } from '../../utils/canvasExport';
+import BaseTemplate from '../templates/BaseTemplate';
+import { exportTemplate, getPreviewImage } from '../../utils/canvasExport';
 
-const TEMPLATES = [
-  T1_DishSpotlight,
-  T2_RoyalStatement,
-  T3_AmbientMood,
-  T4_FloatingVerse,
-  T5_ArtisanFrame,
-  T6_RoyalFeast,
-  T7_BreakfastBliss,
-  T8_BrunchBliss,
-  T9_MorningMood,
-  T10_PerfectHarmony,
-  T11_TastyMorning,
-  T12_GoldenBrunch,
-  T13_MorningMood,
-  T14_FuelYourMorning,
-];
+const TEMPLATES = [BaseTemplate];
 
 const CATEGORIES = ['Editorial', 'Arch', 'Glassmorphism', 'Classic'];
 
-export default function PreviewFrame({ state, activeTpl, setHero, setFg, setLogo, setActiveTemplate, setSelectedZoneId, setZoneText, TEMPLATE_DEFAULTS }) {
-  const ActiveComponent = TEMPLATES[state.activeTemplate];
+export default function PreviewFrame({
+  state, activeTpl,
+  setHero, setFg, setLogo, setActiveTemplate, setSelectedZoneId, setZoneText, setZoneStyle,
+  TEMPLATE_DEFAULTS,
+  // Project props
+  onSave, onOpenProjects, onRenameProject, saveStatus, currentProjectName,
+}) {
+  const ActiveComponent = TEMPLATES[state.activeTemplate] || BaseTemplate;
   const frameRef = useRef(null);
   
   const [isExporting, setIsExporting] = useState(false);
   const [dragLayer, setDragLayer] = useState(null); // 'hero', 'fg', or 'logo'
   const [activeCategory, setActiveCategory] = useState(activeTpl.category || 'Editorial');
+  const [fullPreviewSrc, setFullPreviewSrc] = useState(null);
   
+  // Rename state
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+  const nameInputRef = useRef(null);
+
+  const startNameEdit = () => {
+    setNameInput(currentProjectName || activeTpl?.zones?.heading?.text || 'Untitled Post');
+    setIsEditingName(true);
+    setTimeout(() => nameInputRef.current?.focus(), 50);
+  };
+
+  const finishNameEdit = () => {
+    if (nameInput.trim()) {
+      onRenameProject(nameInput.trim());
+    }
+    setIsEditingName(false);
+  };
+
   React.useEffect(() => {
     if (!CATEGORIES.includes(activeCategory)) {
       setActiveCategory('Editorial');
     }
   }, [activeCategory]);
   
-  const handleExport = async () => {
+  const handleExport = async (format) => {
     setIsExporting(true);
     try {
-      await exportToPNG(activeTpl, state.activeTemplate);
+      await exportTemplate(activeTpl, format, currentProjectName || activeTpl?.zones?.heading?.text || 'export', state.brandTheme);
     } catch (err) {
       console.error("Export failed:", err);
-      alert("Failed to export image. Check console for details.");
+      alert("Failed to export image: " + (err.message || err));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handlePreview = async () => {
+    setIsExporting(true);
+    try {
+      const src = await getPreviewImage(activeTpl, state.brandTheme);
+      setFullPreviewSrc(src);
+    } catch (err) {
+      console.error("Preview failed:", err);
+      alert("Failed to generate preview: " + (err.message || err));
     } finally {
       setIsExporting(false);
     }
@@ -73,7 +83,7 @@ export default function PreviewFrame({ state, activeTpl, setHero, setFg, setLogo
     const dx = (e.movementX / rect.width) * 100;
     const dy = (e.movementY / rect.height) * 100;
     
-    if (dragLayer === 'hero' && activeTpl.hero.url) {
+    if (dragLayer === 'hero' && activeTpl.hero.url && !activeTpl.hero.locked) {
       setHero({ 
         x: activeTpl.hero.x + dx,
         y: activeTpl.hero.y + dy
@@ -115,13 +125,39 @@ export default function PreviewFrame({ state, activeTpl, setHero, setFg, setLogo
           <div className="pv-tabs">
             <button className="pv-tab active">Instagram (4:5)</button>
           </div>
-          <button 
-            className="pv-export-btn" 
-            onClick={handleExport}
-            disabled={isExporting}
-          >
-            {isExporting ? 'Exporting...' : 'Export High-Res PNG'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              className="pv-projects-btn"
+              onClick={onOpenProjects}
+              title="Browse saved projects"
+            >
+              📂 Projects
+            </button>
+
+            <button
+              className="pv-save-btn"
+              onClick={onSave}
+              disabled={saveStatus === 'saving'}
+              title="Save now"
+            >
+              💾 Save
+            </button>
+
+            <div className="pv-header-actions" style={{ display: 'flex', gap: '4px' }}>
+              <button className="pv-export-btn" onClick={handlePreview} disabled={isExporting} style={{ backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #333' }}>
+                {isExporting ? '...' : '🔍 Preview'}
+              </button>
+              <button className="pv-export-btn" onClick={() => handleExport('png')} disabled={isExporting}>
+                PNG
+              </button>
+              <button className="pv-export-btn" onClick={() => handleExport('jpeg')} disabled={isExporting}>
+                JPG
+              </button>
+              <button className="pv-export-btn" onClick={() => handleExport('pdf')} disabled={isExporting}>
+                PDF
+              </button>
+            </div>
+          </div>
         </div>
         
         {/* Category Tabs */}
@@ -162,7 +198,7 @@ export default function PreviewFrame({ state, activeTpl, setHero, setFg, setLogo
         <div 
           className="pv-frame" 
           ref={frameRef}
-          style={{ cursor: dragLayer ? 'grabbing' : activeTpl.hero.url ? 'grab' : 'default' }}
+          style={{ cursor: dragLayer ? 'grabbing' : (activeTpl.hero.url && !activeTpl.hero.locked) ? 'grab' : 'default' }}
           onMouseDown={(e) => {
              if (e.target.closest('.t-logo-img')) handleMouseDown(e, 'logo');
              else if (e.target.closest('.t-fg-img')) handleMouseDown(e, 'fg');
@@ -184,6 +220,36 @@ export default function PreviewFrame({ state, activeTpl, setHero, setFg, setLogo
           {activeTpl.hero.url && " Drag image to reposition."}
         </div>
       </div>
+
+      {/* Full Screen Preview Modal */}
+      {fullPreviewSrc && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.9)',
+            zIndex: 99999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'zoom-out'
+          }}
+          onClick={() => setFullPreviewSrc(null)}
+          title="Click anywhere to close"
+        >
+          <img 
+            src={fullPreviewSrc} 
+            alt="Full size preview" 
+            style={{ 
+              maxWidth: '90%', 
+              maxHeight: '90%', 
+              objectFit: 'contain', 
+              boxShadow: '0 0 40px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }} 
+          />
+        </div>
+      )}
     </div>
   );
 }
