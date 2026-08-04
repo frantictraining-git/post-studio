@@ -35,6 +35,10 @@ function loadImage(src) {
 }
 
 function drawCover(ctx, img, w, h, posX = 50, posY = 50, scale = 1, mirror = false) {
+  const safePosX = Number.isFinite(posX) ? posX : 50;
+  const safePosY = Number.isFinite(posY) ? posY : 50;
+  const safeScale = Number.isFinite(scale) ? scale : 1;
+
   const iAR = img.naturalWidth / img.naturalHeight;
   const cAR = w / h;
   let sWidth, sHeight, sx, sy;
@@ -54,11 +58,11 @@ function drawCover(ctx, img, w, h, posX = 50, posY = 50, scale = 1, mirror = fal
   ctx.save();
   const originX = w / 2;
   const originY = h / 2;
-  const translateX = w * ((posX - 50) / 100);
-  const translateY = h * ((posY - 50) / 100);
+  const translateX = w * ((safePosX - 50) / 100);
+  const translateY = h * ((safePosY - 50) / 100);
   
   ctx.translate(originX + translateX, originY + translateY);
-  ctx.scale(scale, scale);
+  ctx.scale(safeScale, safeScale);
   if (mirror) ctx.scale(-1, 1);
   
   ctx.drawImage(img, sx, sy, sWidth, sHeight, -w/2, -h/2, w, h);
@@ -259,6 +263,10 @@ async function generateCanvas(activeTpl, brandTheme, targetWidth) {
       if (isEditorial) {
         ctx.translate(W / 2, 0);
         drawCover(ctx, img, W / 2, H, hero.x, hero.y, hero.scale, hero.mirror);
+      } else if (isArch) {
+        const ax = W * 0.1, ay = H * 0.15, aw = W * 0.8, ah = H * 0.85;
+        ctx.translate(ax, ay);
+        drawCover(ctx, img, aw, ah, hero.x, hero.y, hero.scale, hero.mirror);
       } else {
         drawCover(ctx, img, W, H, hero.x, hero.y, hero.scale, hero.mirror);
       }
