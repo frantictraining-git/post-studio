@@ -36,13 +36,14 @@ function SnapGuideLine({ type, position, gizmoRef }) {
 export default function TransformGizmo({ isActive, children, onDrag, onScale, onResizeWidth, onClick, styleOverrides, snapEnabled }) {
   const [isScaling, setIsScaling] = useState(false);
   const [isResizingWidth, setIsResizingWidth] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [snapGuides, setSnapGuides] = useState({ x: null, y: null });
   const gizmoRef = useRef(null);
-  const dragState = useRef({ isDragging: false, startX: 0, startY: 0, accumulatedDx: 0, accumulatedDy: 0, snappedX: false, snappedY: false });
+  const dragState = useRef({ startX: 0, startY: 0, accumulatedDx: 0, accumulatedDy: 0, snappedX: false, snappedY: false });
 
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
-      if (dragState.current.isDragging) {
+      if (isDragging) {
         let dx = e.movementX;
         let dy = e.movementY;
         
@@ -153,7 +154,7 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
     };
 
     const handleGlobalMouseUp = () => {
-      dragState.current.isDragging = false;
+      setIsDragging(false);
       dragState.current.snappedX = false;
       dragState.current.snappedY = false;
       setIsScaling(false);
@@ -161,7 +162,7 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
       setSnapGuides({ x: null, y: null });
     };
 
-    if (dragState.current.isDragging || isScaling || isResizingWidth) {
+    if (isDragging || isScaling || isResizingWidth) {
       window.addEventListener('mousemove', handleGlobalMouseMove);
       window.addEventListener('mouseup', handleGlobalMouseUp);
     }
@@ -169,7 +170,7 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
       window.removeEventListener('mousemove', handleGlobalMouseMove);
       window.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [dragState.current.isDragging, isScaling, isResizingWidth, onDrag, onScale, onResizeWidth, snapEnabled]);
+  }, [isDragging, isScaling, isResizingWidth, onDrag, onScale, onResizeWidth, snapEnabled]);
 
   // Map the newGuides state to canvas CSS absolute properties
   const guideStyle = { position: 'absolute', backgroundColor: '#00f0ff', zIndex: 9999, pointerEvents: 'none' };
@@ -198,11 +199,9 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
           if (e.target.closest('.gizmo-handle')) return;
           e.stopPropagation();
           if (onClick) onClick();
-          if (isActive) {
-            dragState.current.isDragging = true;
-            dragState.current.startX = e.clientX;
-            dragState.current.startY = e.clientY;
-          }
+          setIsDragging(true);
+          dragState.current.startX = e.clientX;
+          dragState.current.startY = e.clientY;
         }}
       >
         <div className="gizmo-content">
