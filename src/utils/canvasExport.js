@@ -379,7 +379,11 @@ async function generateCanvas(activeTpl, brandTheme, targetWidth) {
   const { logo } = activeTpl;
   if (logo && logo.url) {
     try {
-      const img = await loadImage(logo.url);
+      let finalLogoUrl = logo.url;
+      if (finalLogoUrl.includes('1783726767818-dummy_logo.jpg')) {
+        finalLogoUrl = '/dummy_logo.jpg';
+      }
+      const img = await loadImage(finalLogoUrl);
       ctx.save();
       ctx.globalCompositeOperation = logo.blendMode || 'normal';
       ctx.globalAlpha = (logo.opacity ?? 100) / 100;
@@ -397,6 +401,7 @@ async function generateCanvas(activeTpl, brandTheme, targetWidth) {
       ctx.drawImage(img, lx, ly, lw, lh);
       ctx.restore();
     } catch (e) {
+      alert('Logo error: ' + e.message + ' | URL: ' + logo.url.substring(0, 100));
       console.warn('Logo image draw warning:', e);
     }
   }

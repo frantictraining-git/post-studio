@@ -56,7 +56,7 @@ export function applyOverlayLogic(template, overlayId, theme, preserveColor = fa
   let logoUrl = template.logo?.url;
   if (!preserveColor || logoUrl === undefined) {
     logoUrl = isWhite ? theme.logoWhiteUrl : theme.logoColoredUrl;
-    if (!logoUrl) logoUrl = theme.logoWhiteUrl || theme.logoColoredUrl || 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media';
+    if (!logoUrl) logoUrl = theme.logoWhiteUrl || theme.logoColoredUrl || '/dummy_logo.jpg';
   }
 
   const newZones = { ...template.zones };
@@ -100,7 +100,7 @@ export function makeInitialState() {
       secondaryColor1: '#FFFFFF',
       secondaryColor2: '#DDDDDD',
       secondaryColor3: '#999999',
-      logoWhiteUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
+      logoWhiteUrl: '/dummy_logo.jpg',
       logoColoredUrl: 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726767818-dummy_logo.jpg?alt=media',
       phone: '+44 1234 567890',
       email: 'hello@brand.com',
