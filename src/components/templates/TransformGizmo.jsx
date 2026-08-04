@@ -39,7 +39,7 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
   const [isDragging, setIsDragging] = useState(false);
   const [snapGuides, setSnapGuides] = useState({ x: null, y: null });
   const gizmoRef = useRef(null);
-  const dragState = useRef({ startX: 0, startY: 0, accumulatedDx: 0, accumulatedDy: 0, snappedX: false, snappedY: false });
+  const dragState = useRef({ lastX: 0, lastY: 0, accumulatedDx: 0, accumulatedDy: 0, snappedX: false, snappedY: false });
 
   const callbacksRef = useRef({ onDrag, onScale, onResizeWidth });
   useEffect(() => {
@@ -49,8 +49,12 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
       if (isDragging) {
-        let dx = e.movementX;
-        let dy = e.movementY;
+        let dx = e.clientX - dragState.current.lastX;
+        let dy = e.clientY - dragState.current.lastY;
+        
+        // Update last position for the next move
+        dragState.current.lastX = e.clientX;
+        dragState.current.lastY = e.clientY;
         
         let newGuides = { x: null, y: null };
         
@@ -91,7 +95,7 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
                 dragState.current.snappedY = true;
                 dragState.current.accumulatedDy = 0;
               } else {
-                dragState.current.accumulatedDy += e.movementY;
+                dragState.current.accumulatedDy += dy;
                 if (Math.abs(dragState.current.accumulatedDy) > SNAP_DIST * 2) {
                   dragState.current.snappedY = false;
                   dy = dragState.current.accumulatedDy;
@@ -121,7 +125,7 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
                 dragState.current.snappedX = true;
                 dragState.current.accumulatedDx = 0;
               } else {
-                dragState.current.accumulatedDx += e.movementX;
+                dragState.current.accumulatedDx += dx;
                 if (Math.abs(dragState.current.accumulatedDx) > SNAP_DIST * 2) {
                   dragState.current.snappedX = false;
                   dx = dragState.current.accumulatedDx;
@@ -145,7 +149,9 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
         
       } else if (isScaling) {
         // Move right or up to increase scale
-        const ds = (e.movementX - e.movementY) * 0.005;
+        const ds = ((e.clientX - dragState.current.lastX) - (e.clientY - dragState.current.lastY)) * 0.005;
+        dragState.current.lastX = e.clientX;
+        dragState.current.lastY = e.clientY;
         if (callbacksRef.current.onScale) callbacksRef.current.onScale(ds);
       } else if (isResizingWidth) {
         // Since the element is centered (-50%, -50%), expanding the width grows it in both directions.
@@ -153,7 +159,8 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
         const frame = gizmoRef.current.closest('.pv-frame');
         const frameW = frame ? frame.getBoundingClientRect().width : 432;
         // Convert screen pixels to percentage of frame width
-        const dwPct = (e.movementX * 2 / frameW) * 100;
+        const dwPct = ((e.clientX - dragState.current.lastX) * 2 / frameW) * 100;
+        dragState.current.lastX = e.clientX;
         if (callbacksRef.current.onResizeWidth) callbacksRef.current.onResizeWidth(dwPct);
       }
     };
@@ -205,8 +212,8 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
           e.stopPropagation();
           if (onClick) onClick();
           setIsDragging(true);
-          dragState.current.startX = e.clientX;
-          dragState.current.startY = e.clientY;
+          dragState.current.lastX = e.clientX;
+          dragState.current.lastY = e.clientY;
         }}
       >
         <div className="gizmo-content">
@@ -216,9 +223,18 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
         {isActive && (
           <>
             <div className="gizmo-border" />
-            <div className="gizmo-handle top-right" title="Scale (Height/Size)" onMouseDown={(e) => { e.stopPropagation(); setIsScaling(true); }} />
+            <div className="gizmo-handle top-right" title="Scale (Height/Size)" onMouseDown={(e) => { 
+              e.stopPropagation(); 
+              setIsScaling(true); 
+              dragState.current.lastX = e.clientX;
+              dragState.current.lastY = e.clientY;
+            }} />
             {onResizeWidth && (
-              <div className="gizmo-handle bottom-right" title="Resize Width" style={{ cursor: 'ew-resize' }} onMouseDown={(e) => { e.stopPropagation(); setIsResizingWidth(true); }} />
+              <div className="gizmo-handle bottom-right" title="Resize Width" style={{ cursor: 'ew-resize' }} onMouseDown={(e) => { 
+                e.stopPropagation(); 
+                setIsResizingWidth(true); 
+                dragState.current.lastX = e.clientX;
+              }} />
             )}
           </>
         )}
