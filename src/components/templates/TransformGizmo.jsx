@@ -41,6 +41,11 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
   const gizmoRef = useRef(null);
   const dragState = useRef({ startX: 0, startY: 0, accumulatedDx: 0, accumulatedDy: 0, snappedX: false, snappedY: false });
 
+  const callbacksRef = useRef({ onDrag, onScale, onResizeWidth });
+  useEffect(() => {
+    callbacksRef.current = { onDrag, onScale, onResizeWidth };
+  }, [onDrag, onScale, onResizeWidth]);
+
   useEffect(() => {
     const handleGlobalMouseMove = (e) => {
       if (isDragging) {
@@ -136,12 +141,12 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
         }
 
         setSnapGuides(newGuides);
-        if (onDrag && (dx !== 0 || dy !== 0)) onDrag(dx, dy);
+        if (callbacksRef.current.onDrag && (dx !== 0 || dy !== 0)) callbacksRef.current.onDrag(dx, dy);
         
       } else if (isScaling) {
         // Move right or up to increase scale
         const ds = (e.movementX - e.movementY) * 0.005;
-        if (onScale) onScale(ds);
+        if (callbacksRef.current.onScale) callbacksRef.current.onScale(ds);
       } else if (isResizingWidth) {
         // Since the element is centered (-50%, -50%), expanding the width grows it in both directions.
         // To make the right handle follow the mouse, we need to add e.movementX * 2.
@@ -149,7 +154,7 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
         const frameW = frame ? frame.getBoundingClientRect().width : 432;
         // Convert screen pixels to percentage of frame width
         const dwPct = (e.movementX * 2 / frameW) * 100;
-        if (onResizeWidth) onResizeWidth(dwPct);
+        if (callbacksRef.current.onResizeWidth) callbacksRef.current.onResizeWidth(dwPct);
       }
     };
 
@@ -170,7 +175,7 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
       window.removeEventListener('mousemove', handleGlobalMouseMove);
       window.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [isDragging, isScaling, isResizingWidth, onDrag, onScale, onResizeWidth, snapEnabled]);
+  }, [isDragging, isScaling, isResizingWidth, snapEnabled]);
 
   // Map the newGuides state to canvas CSS absolute properties
   const guideStyle = { position: 'absolute', backgroundColor: '#00f0ff', zIndex: 9999, pointerEvents: 'none' };
