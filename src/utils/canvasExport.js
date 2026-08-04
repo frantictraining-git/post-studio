@@ -1,8 +1,21 @@
 import jsPDF from 'jspdf';
 
-const W = 1080;
-const H = 1350;
-const SCALE = 2.5; // 1080px canvas / 432px preview frame = 2.5
+const FRAME_PX = 432; // matches the on-screen .pv-frame width (432x540 = 4:5)
+const ASPECT_RATIO = 1350 / 1080; // Instagram portrait 4:5
+
+// Export resolution presets — width in px, height derived from the 4:5 ratio.
+export const EXPORT_SIZES = {
+  standard: 1080,
+  hd: 2000,
+};
+const DEFAULT_EXPORT_WIDTH = EXPORT_SIZES.hd;
+
+function getDimensions(targetWidth = DEFAULT_EXPORT_WIDTH) {
+  const W = Math.round(targetWidth);
+  const H = Math.round(W * ASPECT_RATIO);
+  const SCALE = W / FRAME_PX; // at the old fixed 1080px export this equals 2.5
+  return { W, H, SCALE };
+}
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -52,18 +65,19 @@ function drawCover(ctx, img, w, h, posX = 50, posY = 50, scale = 1, mirror = fal
   ctx.restore();
 }
 
-function applyTextShadow(ctx, shadow) {
+function applyTextShadow(ctx, shadow, scale = 2.5) {
+  const s = scale / 2.5; // keeps shadow softness proportional at any export resolution
   if (shadow === 'soft') {
     ctx.shadowColor = 'rgba(0,0,0,0.85)';
-    ctx.shadowBlur = 28;
-    ctx.shadowOffsetY = 2;
+    ctx.shadowBlur = 28 * s;
+    ctx.shadowOffsetY = 2 * s;
   } else if (shadow === 'hard') {
     ctx.shadowColor = 'rgba(0,0,0,0.95)';
-    ctx.shadowBlur = 40;
-    ctx.shadowOffsetY = 6;
+    ctx.shadowBlur = 40 * s;
+    ctx.shadowOffsetY = 6 * s;
   } else if (shadow === 'glow') {
     ctx.shadowColor = 'rgba(162,130,66,0.6)';
-    ctx.shadowBlur = 40;
+    ctx.shadowBlur = 40 * s;
     ctx.shadowOffsetY = 0;
   } else {
     ctx.shadowColor = 'transparent';
@@ -72,9 +86,10 @@ function applyTextShadow(ctx, shadow) {
   }
 }
 
-function drawText(ctx, zone, brandTheme) {
+function drawText(ctx, zone, brandTheme, dims) {
   if (!zone || zone.visible === false || !zone.text) return;
-  
+  const { W, H, SCALE } = dims;
+
   const text = zone.text;
   let display = text;
   const transform = zone.transform || (zone.caps ? 'uppercase' : 'none');
@@ -169,7 +184,7 @@ function drawText(ctx, zone, brandTheme) {
       startX = -containerWidth / 2;
     }
 
-    applyTextShadow(ctx, zone.shadow);
+    applyTextShadow(ctx, zone.shadow, SCALE);
     
     if (tracking > 0) {
       const chars = [...lineText];
@@ -188,7 +203,7 @@ function drawText(ctx, zone, brandTheme) {
   ctx.restore();
 }
 
-async function generateCanvas(activeTpl, brandTheme) {
+async function generateCanvas(activeTpl, brandTheme, targetWidth) {
   if (document.fonts && document.fonts.ready) {
     try {
       await document.fonts.ready;
@@ -196,6 +211,8 @@ async function generateCanvas(activeTpl, brandTheme) {
       console.warn('Font loading wait warning:', e);
     }
   }
+
+  const { W, H, SCALE } = getDimensions(targetWidth);
 
   const canvas = document.createElement('canvas');
   canvas.width  = W;
@@ -221,7 +238,7 @@ async function generateCanvas(activeTpl, brandTheme) {
       if (isArch) {
         ctx.beginPath();
         const ax = W * 0.1, ay = H * 0.15, aw = W * 0.8, ah = H * 0.85;
-        const rad = 500;
+        const rad = 500 * (W / 1080); // corner radius scales with export resolution
         ctx.moveTo(ax + rad, ay);
         ctx.lineTo(ax + aw - rad, ay);
         ctx.arcTo(ax + aw, ay, ax + aw, ay + rad, rad);
@@ -260,7 +277,7 @@ async function generateCanvas(activeTpl, brandTheme) {
     if (isArch) {
       ctx.beginPath();
       const ax = W * 0.1, ay = H * 0.15, aw = W * 0.8, ah = H * 0.85;
-      const rad = 500;
+      const rad = 500 * (W / 1080); // corner radius scales with export resolution
       ctx.moveTo(ax + rad, ay);
       ctx.lineTo(ax + aw - rad, ay);
       ctx.arcTo(ax + aw, ay, ax + aw, ay + rad, rad);
@@ -387,26 +404,28 @@ async function generateCanvas(activeTpl, brandTheme) {
   // 7. Text Layers
   if (activeTpl.zones) {
     for (const key of Object.keys(activeTpl.zones)) {
-      drawText(ctx, activeTpl.zones[key], brandTheme);
+      drawText(ctx, activeTpl.zones[key], brandTheme, { W, H, SCALE });
     }
   }
 
   return canvas;
 }
 
-export async function exportTemplate(activeTpl, format = 'png', filename = 'post', brandTheme = null) {
+// targetWidth defaults to EXPORT_SIZES.hd (2000px wide / 2500px tall, 4:5).
+// Pass EXPORT_SIZES.standard (1080) for the old smaller size if ever needed.
+export async function exportTemplate(activeTpl, format = 'png', filename = 'post', brandTheme = null, targetWidth = DEFAULT_EXPORT_WIDTH) {
   if (!activeTpl) throw new Error('Active template state not provided.');
   
-  const canvas = await generateCanvas(activeTpl, brandTheme);
+  const canvas = await generateCanvas(activeTpl, brandTheme, targetWidth);
 
   if (format === 'pdf') {
     const dataUrl = canvas.toDataURL('image/png');
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'px',
-      format: [1080, 1350]
+      format: [canvas.width, canvas.height]
     });
-    pdf.addImage(dataUrl, 'PNG', 0, 0, 1080, 1350);
+    pdf.addImage(dataUrl, 'PNG', 0, 0, canvas.width, canvas.height);
     pdf.save(`${filename}.pdf`);
   } else {
     const mimeType = format === 'jpeg' || format === 'jpg' ? 'image/jpeg' : 'image/png';
@@ -419,12 +438,14 @@ export async function exportTemplate(activeTpl, format = 'png', filename = 'post
       a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 2000);
-    }, mimeType, 0.95);
+    }, mimeType, 0.98);
   }
 }
 
-export async function getPreviewImage(activeTpl, brandTheme = null) {
+// Preview modal stays at the standard size — it's just for on-screen zoom,
+// so there's no need to pay the cost of rendering at full export resolution.
+export async function getPreviewImage(activeTpl, brandTheme = null, targetWidth = EXPORT_SIZES.standard) {
   if (!activeTpl) throw new Error('Active template state not provided.');
-  const canvas = await generateCanvas(activeTpl, brandTheme);
+  const canvas = await generateCanvas(activeTpl, brandTheme, targetWidth);
   return canvas.toDataURL('image/jpeg', 0.95);
 }

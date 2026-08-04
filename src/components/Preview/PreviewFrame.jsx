@@ -216,7 +216,7 @@ export default function PreviewFrame({
         </div>
         
         <div className="pv-hint">
-          Preview is scaled down. Export is full 1080×1350px. 
+          Preview is scaled down. Export is full 2000×2500px. 
           {activeTpl.hero.url && " Drag image to reposition."}
         </div>
       </div>
