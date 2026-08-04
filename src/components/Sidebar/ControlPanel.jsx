@@ -481,16 +481,16 @@ export default function ControlPanel({
                   <div className="cp-group">
                     <div className="cp-row">
                       <label className="cp-label">Position X</label>
-                      <span className="cp-val">{logo.x?.toFixed(1)}%</span>
+                      <span className="cp-val">{Number.isFinite(logo.x) ? logo.x.toFixed(1) : 50}%</span>
                     </div>
-                    <input type="range" min="0" max="100" step="0.5" value={logo.x || 50} onChange={(e) => setLogo({ x: Number(e.target.value) })} />
+                    <input type="range" min="0" max="100" step="0.5" value={Number.isFinite(logo.x) ? logo.x : 50} onChange={(e) => setLogo({ x: Number(e.target.value) })} />
                   </div>
                   <div className="cp-group">
                     <div className="cp-row">
                       <label className="cp-label">Position Y</label>
-                      <span className="cp-val">{logo.y?.toFixed(1)}%</span>
+                      <span className="cp-val">{Number.isFinite(logo.y) ? logo.y.toFixed(1) : 15}%</span>
                     </div>
-                    <input type="range" min="0" max="100" step="0.5" value={logo.y || 50} onChange={(e) => setLogo({ y: Number(e.target.value) })} />
+                    <input type="range" min="0" max="100" step="0.5" value={Number.isFinite(logo.y) ? logo.y : 15} onChange={(e) => setLogo({ y: Number(e.target.value) })} />
                   </div>
                 </>
               )}

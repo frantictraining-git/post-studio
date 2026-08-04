@@ -289,24 +289,28 @@ export function SharedLayers({ tpl, selectedZoneId, onSelectZone, setLogo, snapE
         <TransformGizmo
           isActive={selectedZoneId === 'logo'}
           snapEnabled={snapEnabled}
+          onClick={() => { if (onSelectZone) onSelectZone('logo'); }}
           onDrag={(dx, dy) => {
-            // Because logo x/y are percentages in App state, 
-            // we should convert dx/dy into percentage.
-            // But since dx is in pixels, we can approximate:
-            // 1% of 1080px is 10.8px. Let's just scale dx down so it doesn't fly off screen.
-            const newX = tpl.logo.x + (dx * 0.1);
-            const newY = tpl.logo.y + (dy * 0.1);
-            if (setLogo) setLogo({ x: newX, y: newY });
+            if (setLogo) {
+              const currentX = Number.isFinite(tpl.logo.x) ? tpl.logo.x : 50;
+              const currentY = Number.isFinite(tpl.logo.y) ? tpl.logo.y : 15;
+              setLogo({
+                x: currentX + (dx / 432) * 100,
+                y: currentY + (dy / 540) * 100
+              });
+            }
           }}
           onScale={(ds) => {
-            if (setLogo) setLogo({ scale: Math.max(0.05, tpl.logo.scale + ds) });
+            if (setLogo) {
+              const currentScale = Number.isFinite(tpl.logo.scale) ? tpl.logo.scale : 1;
+              setLogo({ scale: Math.max(0.1, currentScale + ds) });
+            }
           }}
-          onClick={() => { if (onSelectZone) onSelectZone('logo'); }}
           styleOverrides={{
             position: 'absolute',
-            left: `${tpl.logo.x}%`,
-            top: `${tpl.logo.y}%`,
-            transform: `translate(-50%, -50%) scale(${tpl.logo.scale})`,
+            left: `${Number.isFinite(tpl.logo.x) ? tpl.logo.x : 50}%`,
+            top: `${Number.isFinite(tpl.logo.y) ? tpl.logo.y : 15}%`,
+            transform: `translate(-50%, -50%) scale(${Number.isFinite(tpl.logo.scale) ? tpl.logo.scale : 1})`,
             pointerEvents: 'auto'
           }}
         >
