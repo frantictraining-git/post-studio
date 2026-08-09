@@ -12,7 +12,7 @@ export default function PreviewFrame({
   setHero, setFg, setLogo, setActiveTemplate, setSelectedZoneId, setZoneText, setZoneStyle,
   TEMPLATE_DEFAULTS,
   // Project props
-  onSave, onOpenProjects, onRenameProject, saveStatus, currentProjectName,
+  onSave, onOpenProjects, onRenameProject, onNewProject, saveStatus, currentProjectName,
 }) {
   const ActiveComponent = TEMPLATES[state.activeTemplate] || BaseTemplate;
   const frameRef = useRef(null);
@@ -126,6 +126,15 @@ export default function PreviewFrame({
             <button className="pv-tab active">Instagram (4:5)</button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              className="pv-projects-btn"
+              onClick={onNewProject}
+              title="Start a new blank project"
+              style={{ background: '#333' }}
+            >
+              ➕ New
+            </button>
+
             <button
               className="pv-projects-btn"
               onClick={onOpenProjects}

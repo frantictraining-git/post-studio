@@ -202,6 +202,69 @@ function reducer(state, action) {
     case 'SET_CURRENT_PROJECT':
       return { ...state, currentProjectId: payload.id, currentProjectName: payload.name };
 
+    case 'START_NEW_PROJECT': {
+      const idx = state.activeTemplate;
+      const t = TEMPLATE_DEFAULTS[idx] || TEMPLATE_DEFAULTS[0];
+      
+      // We need to re-initialize it like we do in LOAD_CLIENT or makeInitialState
+      // Just applying the overlay logic with the current brand theme is enough to reset it.
+      let defaultHeroUrl = null;
+      if (t.id === 't6') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686748408-royal_feast_hero.jpg?alt=media';
+      } else if (t.id === 't7') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783725626395-breakfast_hero.jpg?alt=media';
+      } else if (t.id === 't8') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726769651-t8_hero.jpg?alt=media';
+      } else if (t.id === 't9') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726771663-t9_hero.jpg?alt=media';
+      } else if (t.id === 't10') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726774242-t10_hero.jpg?alt=media';
+      } else if (t.id === 't11') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727625330-t11_hero.jpg?alt=media';
+      } else if (t.id === 't12') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727628101-t12_hero.jpg?alt=media';
+      } else if (t.id === 't13') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727629778-t13_hero.jpg?alt=media';
+      } else if (t.id === 't14') {
+        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727631759-t14_hero.jpg?alt=media';
+      }
+
+      let updatedZones = JSON.parse(JSON.stringify(t.zones));
+      const theme = state.brandTheme;
+      
+      // Map brand data
+      if (updatedZones.phone) updatedZones.phone = { ...updatedZones.phone, text: theme.phone || '' };
+      if (updatedZones.location) updatedZones.location = { ...updatedZones.location, text: theme.location || '' };
+      if (updatedZones.website) updatedZones.website = { ...updatedZones.website, text: theme.webAddress || '' };
+      if (updatedZones.tagline) updatedZones.tagline = { ...updatedZones.tagline, text: theme.tagline || '' };
+      if (updatedZones.subtitle) updatedZones.subtitle = { ...updatedZones.subtitle, text: theme.tagline || '' };
+      if (updatedZones.social) updatedZones.social = { ...updatedZones.social, text: theme.insta || '' };
+      if (updatedZones.instagram) updatedZones.instagram = { ...updatedZones.instagram, text: theme.insta || '' };
+      if (updatedZones.facebook) updatedZones.facebook = { ...updatedZones.facebook, text: theme.facebook || '' };
+      if (updatedZones.youtube) updatedZones.youtube = { ...updatedZones.youtube, text: theme.youtube || '' };
+      if (updatedZones.tiktok) updatedZones.tiktok = { ...updatedZones.tiktok, text: theme.tiktok || '' };
+
+      const baseT = {
+        ...t,
+        hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false },
+        fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
+        logo: { url: null, scale: 0.3, x: 50, y: 15 },
+        overlay: { id: t.defaultOverlay || 'none', opacity: 100 },
+        zones: updatedZones
+      };
+
+      const restored = applyOverlayLogic(baseT, baseT.overlay.id, state.brandTheme, true);
+      const templates = [...state.templates];
+      templates[idx] = restored;
+
+      return { 
+        ...state, 
+        templates, 
+        currentProjectId: null, 
+        currentProjectName: null 
+      };
+    }
+
     case 'TOGGLE_SNAP':
       return { ...state, snapEnabled: !state.snapEnabled };
 
@@ -398,6 +461,9 @@ export function useStudio() {
   const loadProject = useCallback((projectId, projectName, templateState) =>
     dispatch({ type: 'LOAD_PROJECT', payload: { projectId, projectName, templateState } }), []);
 
+  const startNewProject = useCallback(() =>
+    dispatch({ type: 'START_NEW_PROJECT' }), []);
+
   const setCurrentProject = useCallback((id, name) =>
     dispatch({ type: 'SET_CURRENT_PROJECT', payload: { id, name } }), []);
 
@@ -420,6 +486,7 @@ export function useStudio() {
     setZoneStyle,
     toggleSnap,
     loadProject,
+    startNewProject,
     setCurrentProject,
     TEMPLATE_DEFAULTS,
   };

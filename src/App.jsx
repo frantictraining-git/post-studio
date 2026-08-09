@@ -18,7 +18,7 @@ function App() {
     setHero, setFg, setLogo, setOverlay,
     setZoneText, setZoneStyle, setSelectedZoneId,
     setBrandTheme, saveClient, deleteClient, loadClient,
-    toggleSnap, loadProject, setCurrentProject,
+    toggleSnap, loadProject, setCurrentProject, startNewProject,
     TEMPLATE_DEFAULTS,
   } = useStudio();
 
@@ -125,6 +125,7 @@ function App() {
         TEMPLATE_DEFAULTS={TEMPLATE_DEFAULTS}
         onSave={doSave}
         onOpenProjects={() => setIsProjectsOpen(true)}
+        onNewProject={startNewProject}
         onRenameProject={(newName) => setCurrentProject(state.currentProjectId, newName)}
         saveStatus={saveStatus}
         currentProjectName={state.currentProjectName}
