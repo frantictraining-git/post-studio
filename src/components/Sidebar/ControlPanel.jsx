@@ -139,11 +139,11 @@ function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle }) {
 
       <div className="cp-row" style={{ marginTop: 8 }}>
         <label className="cp-label">Pos X</label>
-        <input type="range" min="-1000" max="1000" value={zoneData.x || 0} onChange={(e) => onChangeStyle(zoneId, { x: parseInt(e.target.value) })} style={{ flex: 1 }} />
+        <input type="range" min="0" max="100" step="0.5" value={zoneData.x ?? 50} onChange={(e) => onChangeStyle(zoneId, { x: Number(e.target.value) })} style={{ flex: 1 }} />
       </div>
       <div className="cp-row" style={{ marginTop: 4 }}>
         <label className="cp-label">Pos Y</label>
-        <input type="range" min="-1000" max="1000" value={zoneData.y || 0} onChange={(e) => onChangeStyle(zoneId, { y: parseInt(e.target.value) })} style={{ flex: 1 }} />
+        <input type="range" min="0" max="100" step="0.5" value={zoneData.y ?? 50} onChange={(e) => onChangeStyle(zoneId, { y: Number(e.target.value) })} style={{ flex: 1 }} />
       </div>
     </div>
   );

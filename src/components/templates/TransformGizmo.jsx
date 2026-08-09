@@ -144,6 +144,15 @@ export default function TransformGizmo({ isActive, children, onDrag, onScale, on
           }
         }
 
+        // Always apply the 1.25 CSS scale correction regardless of snap mode.
+        // The block above only runs when snapEnabled=true AND frame is found.
+        // Without this guard the division above would be skipped (snap=off) and
+        // drag would be 1.25x too fast.
+        if (!snapEnabled || !gizmoRef.current?.closest('.pv-frame')) {
+          dx = dx / 1.25;
+          dy = dy / 1.25;
+        }
+
         setSnapGuides(newGuides);
         if (callbacksRef.current.onDrag && (dx !== 0 || dy !== 0)) callbacksRef.current.onDrag(dx, dy);
         
