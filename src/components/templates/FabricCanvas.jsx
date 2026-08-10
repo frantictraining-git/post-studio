@@ -402,8 +402,18 @@ export default function FabricCanvas({
       const centerX = FRAME_W / 2;
       const centerY = FRAME_H / 2;
 
-      // Snap X
       const snapPointsX = [0, centerX, FRAME_W];
+      const snapPointsY = [0, centerY, FRAME_H];
+
+      // Snap to other objects' centers
+      canvas.getObjects().forEach(other => {
+        if (other !== obj && other.id && other.id !== 'guide' && other.id !== 'smart-guide' && other.id !== 'hero' && other.id !== 'fg') {
+          snapPointsX.push(other.left);
+          snapPointsY.push(other.top);
+        }
+      });
+
+      // Snap X
       let snappedX = false;
       for (const px of snapPointsX) {
         if (Math.abs(obj.left - px) < SNAP_THRESHOLD) {
@@ -416,7 +426,6 @@ export default function FabricCanvas({
       if (!snappedX) vSnapLine.set({ opacity: 0 });
 
       // Snap Y
-      const snapPointsY = [0, centerY, FRAME_H];
       let snappedY = false;
       for (const py of snapPointsY) {
         if (Math.abs(obj.top - py) < SNAP_THRESHOLD) {
