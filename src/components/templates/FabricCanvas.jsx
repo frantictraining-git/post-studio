@@ -479,6 +479,8 @@ export default function FabricCanvas({
 
   return (
     <div ref={containerRef} style={{ position: 'absolute', inset: 0 }}>
+      <canvas ref={canvasRef} />
+
       {showRulers && (
         <>
           <div className="canvas-ruler-corner" />
@@ -502,8 +504,6 @@ export default function FabricCanvas({
           }}
         />
       )}
-
-      <canvas ref={canvasRef} />
     </div>
   );
 }
