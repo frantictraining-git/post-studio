@@ -132,7 +132,7 @@ export function makeInitialState() {
     brandTheme: initialTheme,
     hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false, filters: { brightness: 0, contrast: 0, saturation: 0 } },
     fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50, clipPath: 'none' },
-    logo: { url: null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
+    logo: { url: initialTheme?.logoWhiteUrl || null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
     overlay: { id: 'none', opacity: 100 },
     templates: TEMPLATE_DEFAULTS.map(t => {
       let defaultHeroUrl = null;
@@ -140,7 +140,7 @@ export function makeInitialState() {
         ...t,
         hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false, filters: { brightness: 0, contrast: 0, saturation: 0 } },
         fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50, clipPath: 'none' },
-        logo: { url: null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
+        logo: { url: initialTheme?.logoWhiteUrl || null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
         overlay: { id: t.defaultOverlay || 'none', opacity: 100 },
         zones: JSON.parse(JSON.stringify(t.zones)),
       };
