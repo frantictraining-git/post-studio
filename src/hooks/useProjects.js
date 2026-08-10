@@ -23,15 +23,25 @@ export function useProjects(client) {
       orderBy('updatedAt', 'desc')
     );
 
+    // Fallback: stop loading if Firestore is unreachable after 3 seconds
+    const fallbackTimer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
     const unsub = onSnapshot(q, (snap) => {
+      clearTimeout(fallbackTimer);
       setProjects(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       setLoading(false);
     }, (err) => {
+      clearTimeout(fallbackTimer);
       console.error('useProjects listener error:', err);
       setLoading(false);
     });
 
-    return () => unsub();
+    return () => {
+      clearTimeout(fallbackTimer);
+      unsub();
+    };
   }, [client]);
 
   /**
