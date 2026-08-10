@@ -40,8 +40,6 @@ function buildGradient(overlayId) {
 
 // ─── Core renderer (shared between preview + export) ───────────────
 export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1) {
-  // Preserve guides before clear
-  const preservedObjects = canvas.getObjects().filter(o => o.id === 'guide' || o.id === 'smart-guide');
   canvas.clear();
 
   const activeOverlay = getOverlayById(tpl.overlay ? tpl.overlay.id : 'none');
@@ -319,8 +317,32 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
     }
   }
 
-  // Restore guides
-  preservedObjects.forEach(g => canvas.add(g));
+  // ── 8. Guides ──────────────────────────────────────────────────────
+  if (tpl.guides) {
+    tpl.guides.forEach(g => {
+      let line;
+      if (g.axis === 'horizontal') {
+        line = new fabric.Line([0, g.pos, FW, g.pos], {
+          id: 'guide', axis: 'horizontal', pos: g.pos,
+          stroke: 'cyan', strokeWidth: 1.5, strokeDashArray: [4, 4],
+          selectable: true, hasControls: false, hasBorders: false,
+          lockMovementX: true, lockMovementY: false,
+          lockScalingX: true, lockScalingY: true, lockRotation: true,
+          hoverCursor: 'row-resize', moveCursor: 'row-resize'
+        });
+      } else {
+        line = new fabric.Line([g.pos, 0, g.pos, FH], {
+          id: 'guide', axis: 'vertical', pos: g.pos,
+          stroke: 'cyan', strokeWidth: 1.5, strokeDashArray: [4, 4],
+          selectable: true, hasControls: false, hasBorders: false,
+          lockMovementX: false, lockMovementY: true,
+          lockScalingX: true, lockScalingY: true, lockRotation: true,
+          hoverCursor: 'col-resize', moveCursor: 'col-resize'
+        });
+      }
+      canvas.add(line);
+    });
+  }
 
   canvas.renderAll();
 }
@@ -335,17 +357,31 @@ export default function FabricCanvas({
   setFg,
   setLogo,
   setZoneStyle,
+  updateGuides,
   showRulers, // From PreviewFrame
 }) {
   const canvasRef      = useRef(null);
   const containerRef   = useRef(null); // Reference to wrapping div
   const fabricRef      = useRef(null);
-  const isInternal     = useRef(false);
-  const tplRef         = useRef(tpl);
+  const isInternal     = useRef(false); // Flag to prevent infinite loops
+  const tplRef         = useRef(tpl);   // Keep latest tpl in ref for handlers
+  const updateGuidesRef= useRef(updateGuides);
   const [dragGuide, setDragGuide]  = useState(null); // { axis: 'horizontal' | 'vertical', pos: number }
 
-  // Sync latest tpl into ref so event handlers always see fresh state
   useEffect(() => { tplRef.current = tpl; }, [tpl]);
+  useEffect(() => { updateGuidesRef.current = updateGuides; }, [updateGuides]);
+
+  const syncGuidesToState = () => {
+    if (!fabricRef.current || !updateGuidesRef.current) return;
+    const canvas = fabricRef.current;
+    const guides = canvas.getObjects().filter(o => o.id === 'guide').map(o => ({
+      axis: o.axis || (o.x1 === o.x2 ? 'vertical' : 'horizontal'),
+      pos: (o.axis === 'vertical' || o.x1 === o.x2) ? o.left : o.top
+    }));
+    isInternal.current = true;
+    updateGuidesRef.current(guides);
+    setTimeout(() => { isInternal.current = false; }, 50);
+  }; // { axis: 'horizontal' | 'vertical', pos: number }
 
   // ── Mount canvas once ────────────────────────────────────────────
   useEffect(() => {
@@ -365,6 +401,7 @@ export default function FabricCanvas({
           canvas.remove(active);
           canvas.discardActiveObject();
           canvas.requestRenderAll();
+          syncGuidesToState();
         }
       }
     };
@@ -447,7 +484,12 @@ export default function FabricCanvas({
     // Drag / scale / rotate → update state
     canvas.on('object:modified', (e) => {
       const obj = e.target;
-      if (!obj?.id || obj.id === 'guide' || obj.id === 'smart-guide') return;
+      if (!obj?.id || obj.id === 'smart-guide') return;
+
+      if (obj.id === 'guide') {
+        syncGuidesToState();
+        return;
+      }
 
       isInternal.current = true;
 
@@ -548,7 +590,7 @@ export default function FabricCanvas({
         
         if (logicalPos > 0 && logicalPos < FRAME_H) {
           const line = new fabric.Line([0, logicalPos, FRAME_W, logicalPos], {
-            id: 'guide', stroke: 'cyan', strokeWidth: 1.5, strokeDashArray: [4, 4],
+            id: 'guide', axis: 'horizontal', pos: logicalPos, stroke: 'cyan', strokeWidth: 1.5, strokeDashArray: [4, 4],
             selectable: true, hasControls: false, hasBorders: false,
             lockMovementX: true, lockMovementY: false,
             lockScalingX: true, lockScalingY: true, lockRotation: true,
@@ -556,6 +598,7 @@ export default function FabricCanvas({
           });
           canvas.add(line);
           canvas.renderAll();
+          syncGuidesToState();
         }
       } else {
         const physicalX = e.clientX - rect.left;
@@ -563,7 +606,7 @@ export default function FabricCanvas({
         
         if (logicalPos > 0 && logicalPos < FRAME_W) {
           const line = new fabric.Line([logicalPos, 0, logicalPos, FRAME_H], {
-            id: 'guide', stroke: 'cyan', strokeWidth: 1.5, strokeDashArray: [4, 4],
+            id: 'guide', axis: 'vertical', pos: logicalPos, stroke: 'cyan', strokeWidth: 1.5, strokeDashArray: [4, 4],
             selectable: true, hasControls: false, hasBorders: false,
             lockMovementX: false, lockMovementY: true,
             lockScalingX: true, lockScalingY: true, lockRotation: true,
@@ -571,6 +614,7 @@ export default function FabricCanvas({
           });
           canvas.add(line);
           canvas.renderAll();
+          syncGuidesToState();
         }
       }
       setDragGuide(null);

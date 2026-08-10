@@ -143,6 +143,7 @@ export function makeInitialState() {
         logo: { url: initialTheme?.logoWhiteUrl || null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
         overlay: { id: t.defaultOverlay || 'none', opacity: 100 },
         zones: JSON.parse(JSON.stringify(t.zones)),
+        guides: [],
       };
       return applyOverlayLogic(baseT, baseT.overlay.id, initialTheme, true);
     }),
@@ -190,6 +191,7 @@ function reducer(state, action) {
         overlay: templateState.overlay || tpl.overlay,
         zones:   templateState.zones   || tpl.zones,
         category: templateState.category || tpl.category,
+        guides:  templateState.guides || tpl.guides || [],
       };
       const templates = [...state.templates];
       templates[tIdx] = restored;
@@ -228,7 +230,8 @@ function reducer(state, action) {
         fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50, clipPath: 'none' },
         logo: { url: null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
         overlay: { id: t.defaultOverlay || 'none', opacity: 100 },
-        zones: updatedZones
+        zones: updatedZones,
+        guides: []
       };
 
       const restored = applyOverlayLogic(baseT, baseT.overlay.id, state.brandTheme, true);
@@ -379,6 +382,9 @@ function reducer(state, action) {
     case 'SET_LOGO':
       return updateTemplate({ logo: { ...state.templates[tIdx].logo, ...payload } });
 
+    case 'UPDATE_GUIDES':
+      return updateTemplate({ guides: payload });
+
     case 'SET_OVERLAY': {
       // payload could be { id: 'dark-fade' } or { opacity: 50 }
       const newOverlay = { ...state.templates[tIdx].overlay, ...payload };
@@ -465,6 +471,9 @@ export function useStudio() {
 
   const setOverlay = useCallback((updates) =>
     dispatch({ type: 'SET_OVERLAY', payload: updates }), []);
+
+  const updateGuides = useCallback((guides) =>
+    dispatch({ type: 'UPDATE_GUIDES', payload: guides }), []);
 
   const setZoneText = useCallback((zoneId, text) =>
     dispatch({ type: 'SET_ZONE_TEXT', payload: { zoneId, text } }), []);

@@ -16,6 +16,7 @@ function App() {
     activeTpl,
     setActiveTemplate,
     setHero, setFg, setLogo, setOverlay,
+    updateGuides,
     setZoneText, setZoneStyle, setSelectedZoneId,
     addTextZone,
     addShapeZone,
@@ -128,6 +129,7 @@ function App() {
         setSelectedZoneId={setSelectedZoneId}
         setZoneText={setZoneText}
         setZoneStyle={setZoneStyle}
+        updateGuides={updateGuides}
         TEMPLATE_DEFAULTS={TEMPLATE_DEFAULTS}
         onSave={doSave}
         onOpenProjects={() => setIsProjectsOpen(true)}

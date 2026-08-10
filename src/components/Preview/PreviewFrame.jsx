@@ -5,7 +5,7 @@ import { exportTemplate, getPreviewImage } from '../../utils/canvasExport';
 
 export default function PreviewFrame({
   state, activeTpl,
-  setHero, setFg, setLogo, setSelectedZoneId, setZoneText, setZoneStyle,
+  setHero, setFg, setLogo, setSelectedZoneId, setZoneText, setZoneStyle, updateGuides,
   // Project props
   onSave, onOpenProjects, onRenameProject, onNewProject, saveStatus, currentProjectName,
 }) {
@@ -151,6 +151,7 @@ export default function PreviewFrame({
             setFg={setFg}
             setLogo={setLogo}
             setZoneStyle={setZoneStyle}
+            updateGuides={updateGuides}
             showRulers={showRulers}
           />
         </div>
