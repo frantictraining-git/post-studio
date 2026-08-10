@@ -1,73 +1,70 @@
-import { toPng, toJpeg } from 'html-to-image';
+import * as fabric from 'fabric';
 import jsPDF from 'jspdf';
+import { renderTplToFabricCanvas } from '../components/templates/FabricCanvas';
 
-const DEFAULT_EXPORT_WIDTH = 2000;
+const PREVIEW_W = 432;
+const PREVIEW_H = 540;
+const EXPORT_W  = 2000;
+const EXPORT_H  = 2500;
+const SCALE     = EXPORT_W / PREVIEW_W; // ~4.63
 
-export async function exportTemplate(activeTpl, format = 'png', filename = 'post', brandTheme = null, targetWidth = DEFAULT_EXPORT_WIDTH) {
-  if (!activeTpl) throw new Error('Active template state not provided.');
-  
-  // Find the preview frame DOM node
-  const frameNode = document.querySelector('.pv-frame');
-  if (!frameNode) throw new Error('Could not find the preview frame to export.');
+// ── Export (PNG / JPG / PDF) at full 2000×2500 ────────────────────
+export async function exportTemplate(activeTpl, format = 'png', filename = 'post') {
+  if (!activeTpl) throw new Error('No template state provided.');
 
-  // Deselect any active elements so bounding boxes don't show up in the export
-  const originalCursor = frameNode.style.cursor;
-  frameNode.style.cursor = 'default';
+  // Offscreen canvas element
+  const el = document.createElement('canvas');
+  el.width  = EXPORT_W;
+  el.height = EXPORT_H;
 
-  // Deselect TransformGizmo boundaries temporarily
-  const gizmos = frameNode.querySelectorAll('.transform-gizmo-border, .resize-handle');
-  gizmos.forEach(el => el.style.display = 'none');
+  const canvas = new fabric.StaticCanvas(el, {
+    width:  EXPORT_W,
+    height: EXPORT_H,
+    enableRetinaScaling: false,
+  });
 
-  try {
-    // The preview is 432px wide. We want to export at 2000px wide.
-    const originalWidth = frameNode.offsetWidth || 432;
-    const scale = targetWidth / originalWidth;
+  await renderTplToFabricCanvas(activeTpl, canvas, EXPORT_W, EXPORT_H, SCALE);
 
-    const options = {
-      quality: 0.98,
-      pixelRatio: scale,
-      skipFonts: false,
-    };
+  const dataUrl = canvas.toDataURL({
+    format: format === 'jpg' || format === 'jpeg' ? 'jpeg' : 'png',
+    quality: 0.98,
+    multiplier: 1,
+  });
 
-    let dataUrl;
-    if (format === 'jpeg' || format === 'jpg') {
-      dataUrl = await toJpeg(frameNode, options);
-    } else {
-      dataUrl = await toPng(frameNode, options);
-    }
+  canvas.dispose();
 
-    if (format === 'pdf') {
-      const imgProps = await new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve({ w: img.width, h: img.height });
-        img.src = dataUrl;
-      });
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [imgProps.w, imgProps.h]
-      });
-      pdf.addImage(dataUrl, 'PNG', 0, 0, imgProps.w, imgProps.h);
-      pdf.save(`${filename}.pdf`);
-    } else {
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = `${filename}.${format}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  } catch (err) {
-    console.error('Export error:', err);
-    throw err;
-  } finally {
-    frameNode.style.cursor = originalCursor;
-    gizmos.forEach(el => el.style.display = '');
+  if (format === 'pdf') {
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [EXPORT_W, EXPORT_H] });
+    pdf.addImage(dataUrl, 'PNG', 0, 0, EXPORT_W, EXPORT_H);
+    pdf.save(`${filename}.pdf`);
+  } else {
+    const a = document.createElement('a');
+    a.href     = dataUrl;
+    a.download = `${filename}.${format === 'jpeg' ? 'jpg' : format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 }
 
-export async function getPreviewImage(activeTpl, brandTheme) {
-  const frameNode = document.querySelector('.pv-frame');
-  if (!frameNode) throw new Error('Could not find the preview frame.');
-  return await toPng(frameNode, { pixelRatio: 2 }); // Lower resolution for fast on-screen preview
+// ── Preview snapshot (used by the 🔍 Preview button) ──────────────
+export async function getPreviewImage(activeTpl) {
+  if (!activeTpl) throw new Error('No template state provided.');
+
+  const el = document.createElement('canvas');
+  el.width  = PREVIEW_W;
+  el.height = PREVIEW_H;
+
+  const canvas = new fabric.StaticCanvas(el, {
+    width:  PREVIEW_W,
+    height: PREVIEW_H,
+    enableRetinaScaling: false,
+  });
+
+  await renderTplToFabricCanvas(activeTpl, canvas, PREVIEW_W, PREVIEW_H, 1);
+
+  const dataUrl = canvas.toDataURL({ format: 'png', multiplier: 2 });
+
+  canvas.dispose();
+  return dataUrl;
 }

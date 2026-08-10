@@ -54,6 +54,21 @@ export default function ProjectsPanel({ isOpen, onClose, projects, loading, onLo
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {client && <span className="pp-client-badge">{client}</span>}
+            {projects.length > 0 && (
+              <button 
+                className="pp-action-btn delete" 
+                onClick={async () => {
+                  if (window.confirm("Are you sure you want to delete ALL saved projects? This cannot be undone.")) {
+                    for (const p of projects) {
+                      await onDelete(p.id);
+                    }
+                  }
+                }}
+                style={{ padding: '4px 8px' }}
+              >
+                Clear All
+              </button>
+            )}
             <button className="pp-close-btn" onClick={onClose}>✕</button>
           </div>
         </div>

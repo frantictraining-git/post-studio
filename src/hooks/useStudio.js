@@ -209,25 +209,6 @@ function reducer(state, action) {
       // We need to re-initialize it like we do in LOAD_CLIENT or makeInitialState
       // Just applying the overlay logic with the current brand theme is enough to reset it.
       let defaultHeroUrl = null;
-      if (t.id === 't6') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686748408-royal_feast_hero.jpg?alt=media';
-      } else if (t.id === 't7') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783725626395-breakfast_hero.jpg?alt=media';
-      } else if (t.id === 't8') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726769651-t8_hero.jpg?alt=media';
-      } else if (t.id === 't9') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726771663-t9_hero.jpg?alt=media';
-      } else if (t.id === 't10') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726774242-t10_hero.jpg?alt=media';
-      } else if (t.id === 't11') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727625330-t11_hero.jpg?alt=media';
-      } else if (t.id === 't12') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727628101-t12_hero.jpg?alt=media';
-      } else if (t.id === 't13') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727629778-t13_hero.jpg?alt=media';
-      } else if (t.id === 't14') {
-        defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727631759-t14_hero.jpg?alt=media';
-      }
 
       let updatedZones = JSON.parse(JSON.stringify(t.zones));
       const theme = state.brandTheme;
@@ -303,25 +284,6 @@ function reducer(state, action) {
       // Apply the client's logo and contact info to all templates
       const updatedTemplates = state.templates.map(t => {
         let defaultHeroUrl = null;
-        if (t.id === 't6') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783686748408-royal_feast_hero.jpg?alt=media';
-        } else if (t.id === 't7') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783725626395-breakfast_hero.jpg?alt=media';
-        } else if (t.id === 't8') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726769651-t8_hero.jpg?alt=media';
-        } else if (t.id === 't9') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726771663-t9_hero.jpg?alt=media';
-        } else if (t.id === 't10') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783726774242-t10_hero.jpg?alt=media';
-        } else if (t.id === 't11') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727625330-t11_hero.jpg?alt=media';
-        } else if (t.id === 't12') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727628101-t12_hero.jpg?alt=media';
-        } else if (t.id === 't13') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727629778-t13_hero.jpg?alt=media';
-        } else if (t.id === 't14') {
-          defaultHeroUrl = 'https://firebasestorage.googleapis.com/v0/b/post-studio-1508a.firebasestorage.app/o/assets%2F1783727631759-t14_hero.jpg?alt=media';
-        }
         let updatedZones = { ...t.zones };
         
         // Map brand data
