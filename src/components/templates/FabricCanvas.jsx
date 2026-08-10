@@ -41,7 +41,7 @@ function buildGradient(overlayId) {
 // ─── Core renderer (shared between preview + export) ───────────────
 export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1) {
   // Preserve guides before clear
-  const guides = canvas.getObjects().filter(o => o.id === 'guide');
+  const preservedObjects = canvas.getObjects().filter(o => o.id === 'guide' || o.id === 'smart-guide');
   canvas.clear();
 
   const activeOverlay = getOverlayById(tpl.overlay ? tpl.overlay.id : 'none');
@@ -114,6 +114,17 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
           selectable: !tpl.hero.locked, evented: !tpl.hero.locked,
         });
       }
+
+      // Apply Filters
+      if (tpl.hero.filters) {
+        const { brightness, contrast, saturation } = tpl.hero.filters;
+        img.filters = [];
+        if (brightness) img.filters.push(new fabric.filters.Brightness({ brightness }));
+        if (contrast) img.filters.push(new fabric.filters.Contrast({ contrast }));
+        if (saturation) img.filters.push(new fabric.filters.Saturation({ saturation }));
+        img.applyFilters();
+      }
+
       canvas.add(img);
     }
   }
@@ -191,6 +202,18 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
         // Store base scale so we can recover % scale on modify
         _baseScale: baseScale,
       });
+
+      // Apply Clip Path
+      if (tpl.fg.clipPath === 'circle') {
+        const radius = Math.min(fgImg.width, fgImg.height) / 2;
+        fgImg.set({
+          clipPath: new fabric.Circle({
+            radius,
+            originX: 'center', originY: 'center',
+          })
+        });
+      }
+
       canvas.add(fgImg);
     }
   }
@@ -222,6 +245,34 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
   if (tpl.zones) {
     for (const [zoneId, zone] of Object.entries(tpl.zones)) {
       if (zone.visible === false) continue;
+
+      if (zone.type === 'shape') {
+        const commonProps = {
+          id: zoneId,
+          originX: 'center', originY: 'center',
+          left: (zone.x / 100) * FW,
+          top:  (zone.y / 100) * FH,
+          fill: zone.color,
+          width: zone.width * scaleMult,
+          height: zone.height * scaleMult,
+          globalCompositeOperation: zone.blendMode || 'source-over',
+          selectable: true, evented: true,
+        };
+
+        if (zone.shapeType === 'circle') {
+          canvas.add(new fabric.Circle({
+            ...commonProps,
+            radius: (zone.width / 2) * scaleMult,
+          }));
+        } else {
+          canvas.add(new fabric.Rect({
+            ...commonProps,
+            rx: (zone.radius || 0) * scaleMult,
+            ry: (zone.radius || 0) * scaleMult,
+          }));
+        }
+        continue;
+      }
 
       let text = zone.text || '';
       if (zone.transform === 'sentence-case') {
@@ -261,6 +312,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
         width: Math.max(zone.width || FW * 0.8, 100) * scaleMult,
         splitByGrapheme: true,
         selectable: true, editable: true,
+        globalCompositeOperation: zone.blendMode || 'source-over',
       });
 
       canvas.add(textObj);
@@ -268,7 +320,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
   }
 
   // Restore guides
-  guides.forEach(g => canvas.add(g));
+  preservedObjects.forEach(g => canvas.add(g));
 
   canvas.renderAll();
 }
@@ -337,10 +389,56 @@ export default function FabricCanvas({
       }
     });
 
+    // ── Object Snapping ──────────────────────────────────────────────
+    const SNAP_THRESHOLD = 12;
+    const hSnapLine = new fabric.Line([0, FRAME_H/2, FRAME_W, FRAME_H/2], { id: 'smart-guide', stroke: 'cyan', strokeWidth: 1, selectable: false, evented: false, opacity: 0 });
+    const vSnapLine = new fabric.Line([FRAME_W/2, 0, FRAME_W/2, FRAME_H], { id: 'smart-guide', stroke: 'cyan', strokeWidth: 1, selectable: false, evented: false, opacity: 0 });
+    canvas.add(hSnapLine, vSnapLine);
+
+    canvas.on('object:moving', (e) => {
+      const obj = e.target;
+      if (!obj || obj.id === 'guide' || obj.id === 'smart-guide') return;
+
+      const centerX = FRAME_W / 2;
+      const centerY = FRAME_H / 2;
+
+      // Snap X
+      const snapPointsX = [0, centerX, FRAME_W];
+      let snappedX = false;
+      for (const px of snapPointsX) {
+        if (Math.abs(obj.left - px) < SNAP_THRESHOLD) {
+          obj.set({ left: px });
+          vSnapLine.set({ x1: px, x2: px, opacity: 1 });
+          snappedX = true;
+          break;
+        }
+      }
+      if (!snappedX) vSnapLine.set({ opacity: 0 });
+
+      // Snap Y
+      const snapPointsY = [0, centerY, FRAME_H];
+      let snappedY = false;
+      for (const py of snapPointsY) {
+        if (Math.abs(obj.top - py) < SNAP_THRESHOLD) {
+          obj.set({ top: py });
+          hSnapLine.set({ y1: py, y2: py, opacity: 1 });
+          snappedY = true;
+          break;
+        }
+      }
+      if (!snappedY) hSnapLine.set({ opacity: 0 });
+    });
+
+    canvas.on('mouse:up', () => {
+      hSnapLine.set({ opacity: 0 });
+      vSnapLine.set({ opacity: 0 });
+      canvas.requestRenderAll();
+    });
+
     // Drag / scale / rotate → update state
     canvas.on('object:modified', (e) => {
       const obj = e.target;
-      if (!obj?.id) return;
+      if (!obj?.id || obj.id === 'guide' || obj.id === 'smart-guide') return;
 
       isInternal.current = true;
 

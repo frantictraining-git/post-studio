@@ -39,7 +39,7 @@ function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle, onRemoveZo
   return (
     <div className="cp-zone">
       <div className="cp-zone-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span>{zoneData.type === 'text' ? 'TEXT LAYER' : zoneId}</span>
+        <span>{zoneData.type === 'shape' ? 'SHAPE LAYER' : zoneData.type === 'text' ? 'TEXT LAYER' : zoneId}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {onRemoveZone && (
             <button 
@@ -149,6 +149,76 @@ function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle, onRemoveZo
         </div>
       </div>
 
+      {zoneData.type === 'shape' && (
+        <>
+          <div className="cp-row" style={{ marginTop: 8 }}>
+            <label className="cp-label" style={{ width: '80px' }}>Blend Mode</label>
+            <select 
+              value={zoneData.blendMode || 'normal'}
+              onChange={(e) => onChangeStyle(zoneId, { blendMode: e.target.value })}
+              style={{ flex: 1 }}
+            >
+              <option value="normal">Normal</option>
+              <option value="multiply">Multiply</option>
+              <option value="screen">Screen</option>
+              <option value="overlay">Overlay</option>
+              <option value="luminosity">Luminosity</option>
+              <option value="color">Color</option>
+            </select>
+          </div>
+          
+          <div className="cp-row" style={{ marginTop: 8 }}>
+            <label className="cp-label" style={{ width: '80px' }}>Fill Color</label>
+            <input 
+              type="color" 
+              value={zoneData.color || '#FFFFFF'}
+              onChange={(e) => onChangeStyle(zoneId, { color: e.target.value })}
+              style={{ flex: 1 }}
+            />
+          </div>
+
+          <div className="cp-row" style={{ marginTop: 8 }}>
+            <label className="cp-label" style={{ width: '80px' }}>Radius</label>
+            <input 
+              type="range" 
+              min="0" 
+              max="200" 
+              value={zoneData.radius || 0}
+              onChange={(e) => onChangeStyle(zoneId, { radius: Number(e.target.value) })}
+              style={{ flex: 1 }}
+            />
+          </div>
+          
+          <div className="cp-row" style={{ marginTop: 8 }}>
+            <label className="cp-label" style={{ width: '80px' }}>Size</label>
+            <input 
+              type="range" 
+              min="10" 
+              max="400" 
+              value={zoneData.width || 100}
+              onChange={(e) => onChangeStyle(zoneId, { width: Number(e.target.value), height: Number(e.target.value) })}
+              style={{ flex: 1 }}
+            />
+          </div>
+        </>
+      )}
+
+      {isText && (
+        <div className="cp-row" style={{ marginTop: 8 }}>
+          <label className="cp-label" style={{ width: '80px' }}>Blend Mode</label>
+          <select 
+            value={zoneData.blendMode || 'normal'}
+            onChange={(e) => onChangeStyle(zoneId, { blendMode: e.target.value })}
+            style={{ flex: 1 }}
+          >
+            <option value="normal">Normal</option>
+            <option value="multiply">Multiply</option>
+            <option value="screen">Screen</option>
+            <option value="overlay">Overlay</option>
+          </select>
+        </div>
+      )}
+
       <div className="cp-row" style={{ marginTop: 8 }}>
         <label className="cp-label">Pos X</label>
         <input type="range" min="0" max="100" step="0.5" value={zoneData.x ?? 50} onChange={(e) => onChangeStyle(zoneId, { x: Number(e.target.value) })} style={{ flex: 1 }} />
@@ -165,7 +235,7 @@ export default function ControlPanel({
   state, activeTpl, setActiveTemplate, 
   setHero, setFg, setLogo, setOverlay, 
   setZoneText, setZoneStyle, setSelectedZoneId,
-  addTextZone, removeTextZone,
+  addTextZone, addShapeZone, removeTextZone,
   setBrandTheme, saveClient, loadClient,
   TEMPLATE_DEFAULTS, onOpenBrandManager, toggleSnap
 }) {
@@ -275,6 +345,31 @@ export default function ControlPanel({
                   <div className="toggle-track"></div>
                 </label>
               </div>
+              
+              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                <h3 style={{ fontSize: '12px', color: '#888', marginBottom: '8px', textTransform: 'uppercase' }}>Filters</h3>
+                <div className="cp-group">
+                  <div className="cp-row">
+                    <label className="cp-label">Brightness</label>
+                    <span className="cp-val">{hero.filters?.brightness || 0}</span>
+                  </div>
+                  <input type="range" min="-1" max="1" step="0.05" value={hero.filters?.brightness || 0} onChange={(e) => setHero({ filters: { ...hero.filters, brightness: Number(e.target.value) } })} />
+                </div>
+                <div className="cp-group">
+                  <div className="cp-row">
+                    <label className="cp-label">Contrast</label>
+                    <span className="cp-val">{hero.filters?.contrast || 0}</span>
+                  </div>
+                  <input type="range" min="-1" max="1" step="0.05" value={hero.filters?.contrast || 0} onChange={(e) => setHero({ filters: { ...hero.filters, contrast: Number(e.target.value) } })} />
+                </div>
+                <div className="cp-group">
+                  <div className="cp-row">
+                    <label className="cp-label">Saturation</label>
+                    <span className="cp-val">{hero.filters?.saturation || 0}</span>
+                  </div>
+                  <input type="range" min="-1" max="1" step="0.05" value={hero.filters?.saturation || 0} onChange={(e) => setHero({ filters: { ...hero.filters, saturation: Number(e.target.value) } })} />
+                </div>
+              </div>
             </>
           )}
         </div>
@@ -335,6 +430,15 @@ export default function ControlPanel({
               </div>
               <div className="cp-group">
                 <div className="cp-row">
+                  <label className="cp-label">Clip Shape</label>
+                </div>
+                <select value={fg.clipPath || 'none'} onChange={(e) => setFg({ clipPath: e.target.value })}>
+                  <option value="none">None</option>
+                  <option value="circle">Circle</option>
+                </select>
+              </div>
+              <div className="cp-group">
+                <div className="cp-row">
                   <label className="cp-label">Opacity</label>
                   <span className="cp-val">{fg.opacity}%</span>
                 </div>
@@ -369,13 +473,22 @@ export default function ControlPanel({
         <div className="cp-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
             <h2 className="cp-section-title" style={{ margin: 0 }}>Template Layers</h2>
-            <button 
-              className="btn-sm" 
-              style={{ padding: '4px 12px', background: '#00f0ff', color: '#000', fontWeight: 'bold' }}
-              onClick={() => addTextZone()}
-            >
-              ➕ Add Text
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                className="btn-sm" 
+                style={{ padding: '4px 12px', background: '#333', color: '#fff', border: '1px solid #555' }}
+                onClick={() => addShapeZone('rect')}
+              >
+                ⬛ Add Shape
+              </button>
+              <button 
+                className="btn-sm" 
+                style={{ padding: '4px 12px', background: '#00f0ff', color: '#000', fontWeight: 'bold' }}
+                onClick={() => addTextZone()}
+              >
+                ➕ Add Text
+              </button>
+            </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
             <div 

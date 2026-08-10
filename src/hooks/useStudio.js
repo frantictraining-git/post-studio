@@ -130,17 +130,17 @@ export function makeInitialState() {
     activeTemplate: 0,
     selectedZoneId: null,
     brandTheme: initialTheme,
-    hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false },
-    fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
-    logo: { url: null, scale: 0.3, x: 50, y: 15 },
+    hero: { url: null, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false, filters: { brightness: 0, contrast: 0, saturation: 0 } },
+    fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50, clipPath: 'none' },
+    logo: { url: null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
     overlay: { id: 'none', opacity: 100 },
     templates: TEMPLATE_DEFAULTS.map(t => {
       let defaultHeroUrl = null;
       const baseT = {
         ...t,
-        hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false },
-        fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
-        logo: { url: null, scale: 0.3, x: 50, y: 15 },
+        hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false, filters: { brightness: 0, contrast: 0, saturation: 0 } },
+        fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50, clipPath: 'none' },
+        logo: { url: null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
         overlay: { id: t.defaultOverlay || 'none', opacity: 100 },
         zones: JSON.parse(JSON.stringify(t.zones)),
       };
@@ -224,9 +224,9 @@ function reducer(state, action) {
 
       const baseT = {
         ...t,
-        hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false },
-        fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50 },
-        logo: { url: null, scale: 0.3, x: 50, y: 15 },
+        hero: { url: defaultHeroUrl, blur: 0, scale: 1.05, x: 50, y: 50, mirror: false, locked: false, filters: { brightness: 0, contrast: 0, saturation: 0 } },
+        fg:   { url: null, blendMode: 'normal', opacity: 100, scale: 1, x: 50, y: 50, clipPath: 'none' },
+        logo: { url: null, scale: 0.3, x: 50, y: 15, blendMode: 'normal' },
         overlay: { id: t.defaultOverlay || 'none', opacity: 100 },
         zones: updatedZones
       };
@@ -260,6 +260,29 @@ function reducer(state, action) {
         align: 'center',
         tracking: 1,
         shadow: 'none',
+        visible: true,
+        x: 50,
+        y: 50,
+        blendMode: 'normal'
+      };
+      const tpl = state.templates[tIdx];
+      const zones = { ...tpl.zones, [id]: newZone };
+      return updateTemplate({ zones });
+    }
+
+    case 'ADD_SHAPE': {
+      const id = `shape_${Date.now()}`;
+      const shapeType = payload || 'rect'; // 'rect' or 'circle'
+      const newZone = {
+        type: 'shape',
+        shapeType: shapeType,
+        color: state.brandTheme.primaryColor2 || '#FFFFFF', // Fill color
+        width: 100,
+        height: 100,
+        radius: shapeType === 'circle' ? 50 : 0, // border radius or circle radius
+        stroke: 'none', // '#000000'
+        strokeWidth: 0,
+        blendMode: 'normal',
         visible: true,
         x: 50,
         y: 50
@@ -451,6 +474,9 @@ export function useStudio() {
 
   const addTextZone = useCallback(() => 
     dispatch({ type: 'ADD_TEXT_ZONE' }), []);
+
+  const addShapeZone = useCallback((type) => 
+    dispatch({ type: 'ADD_SHAPE', payload: type }), []);
     
   const removeTextZone = useCallback((zoneId) => 
     dispatch({ type: 'REMOVE_TEXT_ZONE', payload: zoneId }), []);
@@ -485,6 +511,7 @@ export function useStudio() {
     setZoneText,
     setZoneStyle,
     addTextZone,
+    addShapeZone,
     removeTextZone,
     toggleSnap,
     loadProject,
