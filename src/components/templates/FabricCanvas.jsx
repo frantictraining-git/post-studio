@@ -349,7 +349,7 @@ export default function FabricCanvas({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Re-render whenever tpl or selectedZoneId changes ─────────────
+  // ── Re-render whenever tpl changes ─────────────
   useEffect(() => {
     if (!fabricRef.current || isInternal.current) return;
     const canvas = fabricRef.current;
@@ -362,7 +362,28 @@ export default function FabricCanvas({
         canvas.requestRenderAll();
       }
     });
-  }, [tpl, selectedZoneId]);
+  }, [tpl]); // Do NOT include selectedZoneId here!
+
+  // ── Sync sidebar selection to canvas active object ─────────────
+  useEffect(() => {
+    if (!fabricRef.current || isInternal.current) return;
+    const canvas = fabricRef.current;
+    
+    // Check if the current active object is already the selected one
+    const activeObj = canvas.getActiveObject();
+    if (activeObj && activeObj.id === selectedZoneId) return; // Prevent infinite loop
+
+    if (selectedZoneId) {
+      const obj = canvas.getObjects().find(o => o.id === selectedZoneId);
+      if (obj) {
+        canvas.setActiveObject(obj);
+        canvas.requestRenderAll();
+      }
+    } else {
+      canvas.discardActiveObject();
+      canvas.requestRenderAll();
+    }
+  }, [selectedZoneId]);
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>
