@@ -407,7 +407,10 @@ export default function FabricCanvas({
             canvas.discardActiveObject();
             canvas.requestRenderAll();
             syncGuidesToState();
-          } else if (active.id && active.id !== 'hero' && active.id !== 'fg' && active.id !== 'logo' && active.id !== 'smart-guide') {
+          } else if (active.id === 'fg') {
+            setFg({ url: null });
+            canvas.discardActiveObject();
+          } else if (active.id && active.id !== 'hero' && active.id !== 'logo' && active.id !== 'smart-guide') {
             // It's a zone (shape or text)
             if (removeTextZone) {
               removeTextZone(active.id);

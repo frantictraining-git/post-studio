@@ -642,6 +642,20 @@ export default function ControlPanel({
                 </>
               )}
             </div>
+          ) : selectedZoneId === 'fg' ? (
+            <div style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+              <div style={{ fontSize: '13px', color: '#ccc', marginBottom: '12px' }}>Foreground Layer is selected.</div>
+              {fg.url ? (
+                <button 
+                  onClick={() => setFg({ url: null })}
+                  style={{ width: '100%', padding: '8px', backgroundColor: 'rgba(255, 68, 68, 0.1)', color: '#ff4444', border: '1px solid rgba(255, 68, 68, 0.3)', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                >
+                  🗑️ Delete Layer
+                </button>
+              ) : (
+                <div style={{ fontSize: '12px', color: '#888' }}>No image uploaded.</div>
+              )}
+            </div>
           ) : (
             zones[selectedZoneId] ? (
               <ZoneControl 
