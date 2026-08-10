@@ -253,6 +253,9 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
           fill: zone.color,
           width: zone.width * scaleMult,
           height: zone.height * scaleMult,
+          scaleX: zone.scaleX ?? 1,
+          scaleY: zone.scaleY ?? 1,
+          angle: zone.angle ?? 0,
           globalCompositeOperation: zone.blendMode || 'source-over',
           selectable: true, evented: true,
         };
@@ -309,6 +312,9 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
         shadow,
         width: Math.max(zone.width || FW * 0.8, 100) * scaleMult,
         splitByGrapheme: true,
+        scaleX: zone.scaleX ?? 1,
+        scaleY: zone.scaleY ?? 1,
+        angle: zone.angle ?? 0,
         selectable: true, editable: true,
         globalCompositeOperation: zone.blendMode || 'source-over',
       });
@@ -527,8 +533,14 @@ export default function FabricCanvas({
         const relScale = obj.scaleX / baseScale;
         setLogo({ x: xPct, y: yPct, scale: Math.max(0.05, relScale) });
       } else {
-        // Text zone — sync position only; font size changes go through the sidebar
-        setZoneStyle(obj.id, { x: xPct, y: yPct });
+        // Text/Shape zone — sync position, scale, and rotation
+        setZoneStyle(obj.id, { 
+          x: xPct, 
+          y: yPct,
+          scaleX: obj.scaleX,
+          scaleY: obj.scaleY,
+          angle: obj.angle
+        });
       }
 
       setTimeout(() => { isInternal.current = false; }, 50);
