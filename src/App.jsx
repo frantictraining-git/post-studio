@@ -22,7 +22,8 @@ function App() {
     addShapeZone,
     removeTextZone,
     setBrandTheme, saveClient, deleteClient, loadClient,
-    toggleSnap, loadProject, setCurrentProject, startNewProject,
+    toggleSnap,    loadProject, startNewProject, setCurrentProject,
+    undo, redo, canUndo, canRedo,
     TEMPLATE_DEFAULTS,
   } = useStudio();
 
@@ -137,6 +138,11 @@ function App() {
         onRenameProject={(newName) => setCurrentProject(state.currentProjectId, newName)}
         saveStatus={saveStatus}
         currentProjectName={state.currentProjectName}
+        undo={undo}
+        redo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        removeTextZone={removeTextZone}
       />
       <BrandManagerModal 
         isOpen={isBrandManagerOpen}

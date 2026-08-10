@@ -227,6 +227,30 @@ function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle, onRemoveZo
         <label className="cp-label">Pos Y</label>
         <input type="range" min="0" max="100" step="0.5" value={zoneData.y ?? 50} onChange={(e) => onChangeStyle(zoneId, { y: Number(e.target.value) })} style={{ flex: 1 }} />
       </div>
+
+      {onRemoveZone && (
+        <div style={{ marginTop: '16px' }}>
+          <button 
+            onClick={() => onRemoveZone(zoneId)}
+            style={{ 
+              width: '100%', 
+              padding: '8px', 
+              backgroundColor: 'rgba(255, 68, 68, 0.1)', 
+              color: '#ff4444', 
+              border: '1px solid rgba(255, 68, 68, 0.3)', 
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
+            }}
+          >
+            🗑️ Delete Layer
+          </button>
+        </div>
+      )}
     </div>
   );
 }

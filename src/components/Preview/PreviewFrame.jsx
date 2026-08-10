@@ -8,6 +8,9 @@ export default function PreviewFrame({
   setHero, setFg, setLogo, setSelectedZoneId, setZoneText, setZoneStyle, updateGuides,
   // Project props
   onSave, onOpenProjects, onRenameProject, onNewProject, saveStatus, currentProjectName,
+  // Undo/Redo
+  undo, redo, canUndo, canRedo,
+  removeTextZone
 }) {
   const frameRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -119,10 +122,28 @@ export default function PreviewFrame({
             <button 
               className="pv-export-btn" 
               onClick={() => setShowRulers(r => !r)} 
-              style={{ backgroundColor: showRulers ? '#a28242' : '#1a1a1a', color: '#fff', border: `1px solid ${showRulers ? '#a28242' : '#333'}`, padding: '10px 12px' }}
+              style={{ backgroundColor: showRulers ? '#a28242' : '#1a1a1a', color: '#fff', border: `1px solid ${showRulers ? '#a28242' : '#333'}`, padding: '10px 12px', marginRight: '8px' }}
               title="Toggle Rulers & Guides"
             >
               📏
+            </button>
+            <button 
+              className="pv-export-btn" 
+              onClick={undo} 
+              disabled={!canUndo} 
+              style={{ backgroundColor: '#1a1a1a', color: canUndo ? '#fff' : '#666', border: '1px solid #333', padding: '10px 12px' }}
+              title="Undo"
+            >
+              ↩️
+            </button>
+            <button 
+              className="pv-export-btn" 
+              onClick={redo} 
+              disabled={!canRedo} 
+              style={{ backgroundColor: '#1a1a1a', color: canRedo ? '#fff' : '#666', border: '1px solid #333', padding: '10px 12px', marginRight: '8px' }}
+              title="Redo"
+            >
+              ↪️
             </button>
             <button className="pv-export-btn" onClick={handlePreview} disabled={isExporting} style={{ backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #333' }}>
               {isExporting ? '...' : '🔍 Preview'}
@@ -152,6 +173,7 @@ export default function PreviewFrame({
             setLogo={setLogo}
             setZoneStyle={setZoneStyle}
             updateGuides={updateGuides}
+            removeTextZone={removeTextZone}
             showRulers={showRulers}
           />
         </div>

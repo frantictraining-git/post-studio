@@ -358,6 +358,7 @@ export default function FabricCanvas({
   setLogo,
   setZoneStyle,
   updateGuides,
+  removeTextZone,
   showRulers, // From PreviewFrame
 }) {
   const canvasRef      = useRef(null);
@@ -397,11 +398,21 @@ export default function FabricCanvas({
     const onKeyDown = (e) => {
       if (e.key === 'Backspace' || e.key === 'Delete') {
         const active = canvas.getActiveObject();
-        if (active && active.id === 'guide') {
-          canvas.remove(active);
-          canvas.discardActiveObject();
-          canvas.requestRenderAll();
-          syncGuidesToState();
+        if (active) {
+          // If editing text, don't delete the object
+          if (active.isEditing) return;
+          
+          if (active.id === 'guide') {
+            canvas.remove(active);
+            canvas.discardActiveObject();
+            canvas.requestRenderAll();
+            syncGuidesToState();
+          } else if (active.id && active.id !== 'hero' && active.id !== 'fg' && active.id !== 'logo' && active.id !== 'smart-guide') {
+            // It's a zone (shape or text)
+            if (removeTextZone) {
+              removeTextZone(active.id);
+            }
+          }
         }
       }
     };

@@ -430,9 +430,58 @@ function reducer(state, action) {
   }
 }
 
+// ─── History Wrapper ────────────────────────────────────────────────
+const UNDOABLE_ACTIONS = [
+  'SET_HERO', 'SET_FG', 'SET_LOGO', 'SET_OVERLAY', 'UPDATE_GUIDES', 
+  'SET_ZONE_TEXT', 'SET_ZONE_STYLE', 'ADD_TEXT_ZONE', 'ADD_SHAPE', 'REMOVE_TEXT_ZONE'
+];
+
+function makeInitialHistoryState() {
+  return { past: [], present: makeInitialState(), future: [], lastAction: {} };
+}
+
+function historyReducer(history, action) {
+  const { past, present, future, lastAction } = history;
+
+  if (action.type === 'UNDO') {
+    if (past.length === 0) return history;
+    const previous = past[past.length - 1];
+    const newPast = past.slice(0, -1);
+    return { past: newPast, present: previous, future: [present, ...future], lastAction: {} };
+  }
+
+  if (action.type === 'REDO') {
+    if (future.length === 0) return history;
+    const next = future[0];
+    const newFuture = future.slice(1);
+    return { past: [...past, present], present: next, future: newFuture, lastAction: {} };
+  }
+
+  const newPresent = reducer(present, action);
+  if (present === newPresent) return history;
+
+  // We only track undo history for changes that alter the template design
+  if (UNDOABLE_ACTIONS.includes(action.type)) {
+    const now = Date.now();
+    const isSameAction = lastAction && lastAction.type === action.type;
+    const isRecent = lastAction && (now - lastAction.time) < 1000;
+    const canGroup = ['SET_HERO', 'SET_FG', 'SET_LOGO', 'SET_OVERLAY', 'SET_ZONE_STYLE', 'SET_ZONE_TEXT'].includes(action.type);
+
+    if (isSameAction && isRecent && canGroup) {
+      return { ...history, present: newPresent, lastAction: { type: action.type, time: now } };
+    } else {
+      const newPast = [...past, present].slice(-10); // Keep max 10 levels
+      return { past: newPast, present: newPresent, future: [], lastAction: { type: action.type, time: now } };
+    }
+  }
+
+  return { ...history, present: newPresent };
+}
+
 // ─── Main Hook ──────────────────────────────────────────────────────
 export function useStudio() {
-  const [state, dispatch] = useReducer(reducer, null, makeInitialState);
+  const [history, dispatch] = useReducer(historyReducer, null, makeInitialHistoryState);
+  const state = history.present;
 
   // Sync clients to localStorage
   useEffect(() => {
@@ -504,6 +553,11 @@ export function useStudio() {
 
   const activeTpl = state.templates[state.activeTemplate];
 
+  const undo = useCallback(() => dispatch({ type: 'UNDO' }), []);
+  const redo = useCallback(() => dispatch({ type: 'REDO' }), []);
+  const canUndo = history.past.length > 0;
+  const canRedo = history.future.length > 0;
+
   return {
     state,
     activeTpl,
@@ -526,6 +580,10 @@ export function useStudio() {
     loadProject,
     startNewProject,
     setCurrentProject,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
     TEMPLATE_DEFAULTS,
   };
 }
