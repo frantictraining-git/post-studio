@@ -250,3 +250,39 @@
   white-space: nowrap;
   transition: color 0.3s;
 }
+
+/* ── Rulers ─── */
+.canvas-ruler {
+  position: absolute;
+  background: #2a2a2a;
+  z-index: 100;
+  user-select: none;
+}
+.canvas-ruler.horizontal {
+  top: 0; left: 24px; right: 0; height: 24px;
+  cursor: row-resize;
+  border-bottom: 1px solid #444;
+  background-image: repeating-linear-gradient(90deg, transparent, transparent 49px, #555 49px, #555 50px);
+}
+.canvas-ruler.vertical {
+  top: 24px; left: 0; bottom: 0; width: 24px;
+  cursor: col-resize;
+  border-right: 1px solid #444;
+  background-image: repeating-linear-gradient(180deg, transparent, transparent 49px, #555 49px, #555 50px);
+}
+.canvas-ruler-corner {
+  position: absolute;
+  top: 0; left: 0; width: 24px; height: 24px;
+  background: #1a1a1a;
+  border-right: 1px solid #444;
+  border-bottom: 1px solid #444;
+  z-index: 101;
+}
+.temp-guide {
+  position: absolute;
+  background: cyan;
+  z-index: 99;
+  pointer-events: none;
+}
+.temp-guide.horizontal { left: 0; right: 0; height: 1px; }
+.temp-guide.vertical { top: 0; bottom: 0; width: 1px; }

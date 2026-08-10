@@ -40,6 +40,8 @@ function buildGradient(overlayId) {
 
 // ─── Core renderer (shared between preview + export) ───────────────
 export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1) {
+  // Preserve guides before clear
+  const guides = canvas.getObjects().filter(o => o.id === 'guide');
   canvas.clear();
 
   const activeOverlay = getOverlayById(tpl.overlay ? tpl.overlay.id : 'none');
@@ -265,6 +267,9 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
     }
   }
 
+  // Restore guides
+  guides.forEach(g => canvas.add(g));
+
   canvas.renderAll();
 }
 
@@ -278,11 +283,14 @@ export default function FabricCanvas({
   setFg,
   setLogo,
   setZoneStyle,
+  showRulers, // From PreviewFrame
 }) {
   const canvasRef      = useRef(null);
+  const containerRef   = useRef(null); // Reference to wrapping div
   const fabricRef      = useRef(null);
   const isInternal     = useRef(false);
-  const tplRef         = useRef(tpl); // keep latest tpl without re-mounting canvas
+  const tplRef         = useRef(tpl);
+  const [dragGuide, setDragGuide]  = useState(null); // { axis: 'horizontal' | 'vertical', pos: number }
 
   // Sync latest tpl into ref so event handlers always see fresh state
   useEffect(() => { tplRef.current = tpl; }, [tpl]);
@@ -296,6 +304,19 @@ export default function FabricCanvas({
       selection: false,
     });
     fabricRef.current = canvas;
+
+    // Keyboard support for deleting guides
+    const onKeyDown = (e) => {
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        const active = canvas.getActiveObject();
+        if (active && active.id === 'guide') {
+          canvas.remove(active);
+          canvas.discardActiveObject();
+          canvas.requestRenderAll();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
 
     // Selection → sidebar highlight
     const syncSelection = (e) => {
@@ -350,9 +371,12 @@ export default function FabricCanvas({
       setTimeout(() => { isInternal.current = false; }, 50);
     });
 
-    return () => canvas.dispose();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // Clean up
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      canvas.dispose();
+    };
+  }, []); // Run ONCE on mount
 
   // ── Re-render whenever tpl changes ─────────────
   useEffect(() => {
@@ -390,8 +414,95 @@ export default function FabricCanvas({
     }
   }, [selectedZoneId]);
 
+  // ── Handle Guide Dragging ────────────────────────────────────────
+  useEffect(() => {
+    if (!dragGuide) return;
+    
+    const onMouseMove = (e) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const pos = dragGuide.axis === 'horizontal' ? e.clientY - rect.top : e.clientX - rect.left;
+      setDragGuide(prev => ({ ...prev, pos }));
+    };
+    
+    const onMouseUp = (e) => {
+      if (!containerRef.current || !fabricRef.current) {
+        setDragGuide(null);
+        return;
+      }
+      
+      const rect = containerRef.current.getBoundingClientRect();
+      const canvas = fabricRef.current;
+      
+      let logicalPos;
+      if (dragGuide.axis === 'horizontal') {
+        const physicalY = e.clientY - rect.top;
+        logicalPos = (physicalY / rect.height) * FRAME_H;
+        
+        if (logicalPos > 0 && logicalPos < FRAME_H) {
+          const line = new fabric.Line([0, logicalPos, FRAME_W, logicalPos], {
+            id: 'guide', stroke: 'cyan', strokeWidth: 1.5, strokeDashArray: [4, 4],
+            selectable: true, hasControls: false, hasBorders: false,
+            lockMovementX: true, lockMovementY: false,
+            lockScalingX: true, lockScalingY: true, lockRotation: true,
+            hoverCursor: 'row-resize', moveCursor: 'row-resize'
+          });
+          canvas.add(line);
+          canvas.renderAll();
+        }
+      } else {
+        const physicalX = e.clientX - rect.left;
+        logicalPos = (physicalX / rect.width) * FRAME_W;
+        
+        if (logicalPos > 0 && logicalPos < FRAME_W) {
+          const line = new fabric.Line([logicalPos, 0, logicalPos, FRAME_H], {
+            id: 'guide', stroke: 'cyan', strokeWidth: 1.5, strokeDashArray: [4, 4],
+            selectable: true, hasControls: false, hasBorders: false,
+            lockMovementX: false, lockMovementY: true,
+            lockScalingX: true, lockScalingY: true, lockRotation: true,
+            hoverCursor: 'col-resize', moveCursor: 'col-resize'
+          });
+          canvas.add(line);
+          canvas.renderAll();
+        }
+      }
+      setDragGuide(null);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [dragGuide]);
+
   return (
-    <div style={{ position: 'absolute', inset: 0 }}>
+    <div ref={containerRef} style={{ position: 'absolute', inset: 0 }}>
+      {showRulers && (
+        <>
+          <div className="canvas-ruler-corner" />
+          <div 
+            className="canvas-ruler horizontal" 
+            onMouseDown={e => setDragGuide({ axis: 'horizontal', pos: e.clientY - containerRef.current.getBoundingClientRect().top })}
+          />
+          <div 
+            className="canvas-ruler vertical" 
+            onMouseDown={e => setDragGuide({ axis: 'vertical', pos: e.clientX - containerRef.current.getBoundingClientRect().left })}
+          />
+        </>
+      )}
+      
+      {dragGuide && (
+        <div 
+          className={`temp-guide ${dragGuide.axis}`}
+          style={{
+            top: dragGuide.axis === 'horizontal' ? dragGuide.pos : 0,
+            left: dragGuide.axis === 'vertical' ? dragGuide.pos : 0
+          }}
+        />
+      )}
+
       <canvas ref={canvasRef} />
     </div>
   );

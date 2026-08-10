@@ -12,6 +12,7 @@ export default function PreviewFrame({
   const frameRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
   const [fullPreviewSrc, setFullPreviewSrc] = useState(null);
+  const [showRulers, setShowRulers] = useState(false);
   
   // Rename state
   const [isEditingName, setIsEditingName] = useState(false);
@@ -115,6 +116,14 @@ export default function PreviewFrame({
           </div>
 
           <div className="pv-header-actions" style={{ display: 'flex', gap: '4px' }}>
+            <button 
+              className="pv-export-btn" 
+              onClick={() => setShowRulers(r => !r)} 
+              style={{ backgroundColor: showRulers ? '#a28242' : '#1a1a1a', color: '#fff', border: `1px solid ${showRulers ? '#a28242' : '#333'}`, padding: '10px 12px' }}
+              title="Toggle Rulers & Guides"
+            >
+              📏
+            </button>
             <button className="pv-export-btn" onClick={handlePreview} disabled={isExporting} style={{ backgroundColor: '#1a1a1a', color: '#fff', border: '1px solid #333' }}>
               {isExporting ? '...' : '🔍 Preview'}
             </button>
@@ -142,6 +151,7 @@ export default function PreviewFrame({
             setFg={setFg}
             setLogo={setLogo}
             setZoneStyle={setZoneStyle}
+            showRulers={showRulers}
           />
         </div>
         
