@@ -12,9 +12,11 @@ function formatDate(ts) {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-export default function ProjectsPanel({ isOpen, onClose, projects, loading, onLoad, onDelete, currentProjectId, client }) {
+export default function ProjectsPanel({ isOpen, onClose, projects, loading, onLoad, onDelete, onRename, currentProjectId, client }) {
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState('');
 
   const filtered = useMemo(() => {
     if (!search.trim()) return projects;
@@ -35,6 +37,20 @@ export default function ProjectsPanel({ isOpen, onClose, projects, loading, onLo
     e.stopPropagation();
     await onDelete(id);
     setConfirmDelete(null);
+  };
+
+  const handleRenameStart = (e, project) => {
+    e.stopPropagation();
+    setEditingId(project.id);
+    setEditName(project.name);
+  };
+
+  const handleRenameSave = async (e, id) => {
+    e.stopPropagation();
+    if (editName.trim() && onRename) {
+      await onRename(id, editName);
+    }
+    setEditingId(null);
   };
 
   return (
@@ -104,13 +120,33 @@ export default function ProjectsPanel({ isOpen, onClose, projects, loading, onLo
               >
                 <div className="pp-card-icon">🖼️</div>
                 <div className="pp-card-info">
-                  <div className="pp-card-name" title={project.name}>{project.name}</div>
+                  {editingId === project.id ? (
+                    <div className="pp-card-name" onClick={e => e.stopPropagation()}>
+                      <input 
+                        value={editName}
+                        onChange={e => setEditName(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleRenameSave(e, project.id)}
+                        onBlur={e => handleRenameSave(e, project.id)}
+                        autoFocus
+                        style={{ background: '#222', color: '#fff', border: '1px solid #444', padding: '2px 6px', width: '100%' }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="pp-card-name" title={project.name}>{project.name}</div>
+                  )}
                   <div className="pp-card-meta">
                     <span>Updated {formatDate(project.updatedAt)}</span>
                     {project.id === currentProjectId && <span style={{ color: '#a28242' }}>● active</span>}
                   </div>
                 </div>
                 <div className="pp-card-actions">
+                  <button
+                    className="pp-action-btn load"
+                    onClick={e => handleRenameStart(e, project)}
+                    title="Rename Project"
+                  >
+                    ✎
+                  </button>
                   <button
                     className="pp-action-btn load"
                     onClick={e => { e.stopPropagation(); handleLoad(project); }}

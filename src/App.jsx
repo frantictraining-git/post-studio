@@ -27,7 +27,7 @@ function App() {
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null); // null | 'saving' | 'saved' | 'error'
 
-  const { projects, loading: projectsLoading, saveProject, deleteProject } = useProjects(state.activeClient);
+  const { projects, loading: projectsLoading, saveProject, deleteProject, renameProject } = useProjects(state.activeClient);
 
   // ── Refs so doSave always has fresh values ──
   const activeTplRef = useRef(activeTpl);
@@ -148,6 +148,7 @@ function App() {
         loading={projectsLoading}
         onLoad={handleLoadProject}
         onDelete={handleDeleteProject}
+        onRename={renameProject}
         currentProjectId={state.currentProjectId}
         client={state.activeClient}
       />

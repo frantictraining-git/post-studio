@@ -79,5 +79,13 @@ export function useProjects(client) {
     await deleteDoc(doc(db, 'projects', id));
   };
 
-  return { projects, loading, saveProject, deleteProject };
+  /**
+   * Rename a project without full update.
+   */
+  const renameProject = async (id, newName) => {
+    if (!newName || !newName.trim()) return;
+    setDoc(doc(db, 'projects', id), { name: newName.trim(), updatedAt: serverTimestamp() }, { merge: true }).catch(err => console.warn('Rename sync delayed:', err));
+  };
+
+  return { projects, loading, saveProject, deleteProject, renameProject };
 }
