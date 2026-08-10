@@ -59,6 +59,7 @@ function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle, onRemoveZo
           />
           <div className="toggle-track"></div>
         </label>
+        </div>
       </div>
       
       {isText && zoneData.visible !== false && (
