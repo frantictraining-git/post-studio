@@ -44,8 +44,8 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
 
   const activeOverlay = getOverlayById(tpl.overlay ? tpl.overlay.id : 'none');
 
-  // ── 1. Background rect ────────────────────────────────────────────
   canvas.add(new fabric.Rect({
+    originX: 'left', originY: 'top',
     left: 0, top: 0, width: FW, height: FH,
     fill: tpl.category === 'Editorial'
       ? (activeOverlay.type === 'solid' ? activeOverlay.css : '#000000')
@@ -74,6 +74,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
           scaleX: scale * (tpl.hero.mirror ? -1 : 1),
           scaleY: scale,
           clipPath: new fabric.Rect({
+            originX: 'left', originY: 'top',
             left: FW * 0.1, top: FH * 0.15,
             width: FW * 0.8, height: FH * 0.85,
             rx: 500 * scaleMult, ry: 500 * scaleMult,
@@ -92,6 +93,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
           scaleX: scale * (tpl.hero.mirror ? -1 : 1),
           scaleY: scale,
           clipPath: new fabric.Rect({
+            originX: 'left', originY: 'top',
             left: FW * 0.5, top: 0, width: FW * 0.5, height: FH,
             absolutePositioned: true,
           }),
@@ -125,6 +127,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
     let archClip = undefined;
     if (isArch) {
       archClip = new fabric.Rect({
+        originX: 'left', originY: 'top',
         left: FW * 0.1, top: FH * 0.15,
         width: FW * 0.8, height: FH * 0.85,
         rx: 500 * scaleMult, ry: 500 * scaleMult,
@@ -141,6 +144,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
 
     if (fill) {
       canvas.add(new fabric.Rect({
+        originX: 'left', originY: 'top',
         left: overlayLeft, top: 0,
         width: overlayWidth, height: FH,
         fill,
@@ -156,6 +160,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
   if (tpl.category === 'Glassmorphism') {
     // Semi-transparent frosted panel, as close as possible without CSS backdrop-filter
     canvas.add(new fabric.Rect({
+      originX: 'left', originY: 'top',
       left: FW * 0.1, top: FH * 0.15,
       width: FW * 0.8, height: FH * 0.7,
       fill: 'rgba(255,255,255,0.15)',
