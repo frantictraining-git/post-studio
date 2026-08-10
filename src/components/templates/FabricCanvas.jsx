@@ -237,7 +237,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
       else if (zone.shadow === 'glow')
         shadow = new fabric.Shadow({ color: 'rgba(162,130,66,0.6)', blur: 40 * scaleMult, offsetX: 0, offsetY: 0 });
 
-      const textObj = new fabric.IText(text, {
+      const textObj = new fabric.Textbox(text, {
         id: zoneId,
         originX: zone.align === 'right' ? 'right' : zone.align === 'center' ? 'center' : 'left',
         originY: 'center',
@@ -251,6 +251,8 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
         textAlign: zone.align,
         charSpacing: (zone.tracking || 0) * 10,
         shadow,
+        width: Math.max(zone.width || FW * 0.8, 100) * scaleMult,
+        splitByGrapheme: true,
         selectable: true, editable: true,
       });
 

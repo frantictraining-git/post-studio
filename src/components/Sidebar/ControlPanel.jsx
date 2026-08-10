@@ -33,14 +33,25 @@ function ImageUpload({ label, onUpload, onClear, hasImage }) {
   );
 }
 
-function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle }) {
+function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle, onRemoveZone }) {
   const isText = zoneData.text !== undefined;
   
   return (
     <div className="cp-zone">
       <div className="cp-zone-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span>{zoneId === 'eyebrow' ? 'Secondary / Eyebrow Text' : zoneId}</span>
-        <label className="toggle" title="Toggle Visibility">
+        <span>{zoneData.type === 'text' ? 'TEXT LAYER' : zoneId}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {onRemoveZone && (
+            <button 
+              className="btn-sm" 
+              style={{ padding: '2px 6px', background: '#333', color: '#ff4444', border: '1px solid #ff4444' }}
+              onClick={() => onRemoveZone(zoneId)}
+              title="Delete Text Box"
+            >
+              🗑️
+            </button>
+          )}
+          <label className="toggle" title="Toggle Visibility">
           <input 
             type="checkbox" 
             checked={zoneData.visible !== false} 
@@ -150,23 +161,12 @@ function ZoneControl({ zoneId, zoneData, onChangeText, onChangeStyle }) {
 }
 
 export default function ControlPanel({ 
-  state, 
-  activeTpl, 
-  setActiveTemplate, 
-  setHero, 
-  setFg, 
-  setLogo,
-  setOverlay,
-  setGrade, 
-  setZoneText, 
-  setZoneStyle,
-  setSelectedZoneId,
-  setBrandTheme,
-  saveClient,
-  loadClient,
-  TEMPLATE_DEFAULTS,
-  onOpenBrandManager,
-  toggleSnap
+  state, activeTpl, setActiveTemplate, 
+  setHero, setFg, setLogo, setOverlay, 
+  setZoneText, setZoneStyle, setSelectedZoneId,
+  addTextZone, removeTextZone,
+  setBrandTheme, saveClient, loadClient,
+  TEMPLATE_DEFAULTS, onOpenBrandManager, toggleSnap
 }) {
   const { hero, fg, logo, grade, zones } = activeTpl;
   const { brandTheme, selectedZoneId, snapEnabled } = state;
@@ -366,7 +366,16 @@ export default function ControlPanel({
 
         {/* Unified Layers */}
         <div className="cp-section">
-          <h2 className="cp-section-title">Template Layers</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <h2 className="cp-section-title" style={{ margin: 0 }}>Template Layers</h2>
+            <button 
+              className="btn-sm" 
+              style={{ padding: '4px 12px', background: '#00f0ff', color: '#000', fontWeight: 'bold' }}
+              onClick={() => addTextZone()}
+            >
+              ➕ Add Text
+            </button>
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '16px' }}>
             <div 
               onClick={() => setSelectedZoneId('logo')}
@@ -406,7 +415,7 @@ export default function ControlPanel({
                 }}
               >
                 <span style={{ fontWeight: selectedZoneId === zId ? 600 : 400, color: '#fff' }}>
-                  {zId.toUpperCase()}
+                  {zData.type === 'text' ? (zData.text || 'TEXT LAYER').substring(0, 15) + ((zData.text || '').length > 15 ? '...' : '') : zId.toUpperCase()}
                 </span>
                 <button 
                   onClick={(e) => {
@@ -498,11 +507,11 @@ export default function ControlPanel({
           ) : (
             zones[selectedZoneId] ? (
               <ZoneControl 
-                key={selectedZoneId}
-                zoneId={selectedZoneId}
-                zoneData={zones[selectedZoneId]}
-                onChangeText={setZoneText}
-                onChangeStyle={setZoneStyle}
+                zoneId={selectedZoneId} 
+                zoneData={zones[selectedZoneId]} 
+                onChangeText={setZoneText} 
+                onChangeStyle={setZoneStyle} 
+                onRemoveZone={removeTextZone}
               />
             ) : (
               <div style={{ fontSize: '12px', color: '#888' }}>Zone not available in this template.</div>

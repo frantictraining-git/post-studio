@@ -17,6 +17,7 @@ function App() {
     setActiveTemplate,
     setHero, setFg, setLogo, setOverlay,
     setZoneText, setZoneStyle, setSelectedZoneId,
+    addTextZone, removeTextZone,
     setBrandTheme, saveClient, deleteClient, loadClient,
     toggleSnap, loadProject, setCurrentProject, startNewProject,
     TEMPLATE_DEFAULTS,
@@ -105,6 +106,8 @@ function App() {
         setZoneText={setZoneText}
         setZoneStyle={setZoneStyle}
         setSelectedZoneId={setSelectedZoneId}
+        addTextZone={addTextZone}
+        removeTextZone={removeTextZone}
         setBrandTheme={setBrandTheme}
         saveClient={saveClient}
         loadClient={loadClient}

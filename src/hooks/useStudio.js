@@ -41,10 +41,7 @@ const TEMPLATE_DEFAULTS = [
   {
     id: 'base', label: 'Base Canvas', icon: '🎨', category: 'Base',
     defaultOverlay: 'dark-fade',
-    zones: makeZones({
-      heading: { type: 'heading', text: 'YOUR HEADING' },
-      subheading: { type: 'subheading', text: 'Your sub heading text goes here' },
-    }),
+    zones: makeZones({}),
   }
 ];
 
@@ -249,6 +246,41 @@ function reducer(state, action) {
     case 'TOGGLE_SNAP':
       return { ...state, snapEnabled: !state.snapEnabled };
 
+    case 'ADD_TEXT_ZONE': {
+      const id = `text_${Date.now()}`;
+      const newZone = {
+        type: 'text',
+        text: 'NEW TEXT',
+        family: state.brandTheme.secondaryFont || 'Inter',
+        size: 24,
+        weight: '400',
+        italic: false,
+        caps: false,
+        color: '#FFFFFF',
+        align: 'center',
+        tracking: 1,
+        shadow: 'none',
+        visible: true,
+        x: 50,
+        y: 50
+      };
+      const tpl = state.templates[tIdx];
+      const zones = { ...tpl.zones, [id]: newZone };
+      return updateTemplate({ zones });
+    }
+
+    case 'REMOVE_TEXT_ZONE': {
+      const id = payload;
+      const tpl = state.templates[tIdx];
+      const zones = { ...tpl.zones };
+      delete zones[id];
+      // Deselect if it was selected
+      const selectedZoneId = state.selectedZoneId === id ? null : state.selectedZoneId;
+      const templates = [...state.templates];
+      templates[tIdx] = { ...tpl, zones };
+      return { ...state, templates, selectedZoneId };
+    }
+
     case 'SET_BRAND_THEME': {
       const newTheme = { ...state.brandTheme, ...payload };
       let updatedTemplates = state.templates.map(t => applyOverlayLogic(t, t.overlay.id, newTheme, true));
@@ -417,6 +449,12 @@ export function useStudio() {
   const setZoneStyle = useCallback((zoneId, style) =>
     dispatch({ type: 'SET_ZONE_STYLE', payload: { zoneId, style } }), []);
 
+  const addTextZone = useCallback(() => 
+    dispatch({ type: 'ADD_TEXT_ZONE' }), []);
+    
+  const removeTextZone = useCallback((zoneId) => 
+    dispatch({ type: 'REMOVE_TEXT_ZONE', payload: zoneId }), []);
+
   const toggleSnap = useCallback(() =>
     dispatch({ type: 'TOGGLE_SNAP' }), []);
 
@@ -446,6 +484,8 @@ export function useStudio() {
     setOverlay,
     setZoneText,
     setZoneStyle,
+    addTextZone,
+    removeTextZone,
     toggleSnap,
     loadProject,
     startNewProject,
