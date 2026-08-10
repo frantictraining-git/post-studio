@@ -14,28 +14,28 @@ const loadFabricImage = (url) =>
       .catch(() => resolve(null));
   });
 
-function buildGradient(overlayId, FRAME_W, FRAME_H) {
+function buildGradient(overlayId) {
   const gradMap = {
     'dark-fade-bottom': {
-      type: 'linear', coords: { x1: 0, y1: FRAME_H, x2: 0, y2: 0 },
+      type: 'linear', coords: { x1: 0, y1: 1, x2: 0, y2: 0 },
       colorStops: [{ offset: 0, color: 'rgba(0,0,0,1)' }, { offset: 0.7, color: 'rgba(0,0,0,0)' }],
     },
     'dark-fade-top': {
-      type: 'linear', coords: { x1: 0, y1: 0, x2: 0, y2: FRAME_H },
+      type: 'linear', coords: { x1: 0, y1: 0, x2: 0, y2: 1 },
       colorStops: [{ offset: 0, color: 'rgba(0,0,0,0.9)' }, { offset: 0.6, color: 'rgba(0,0,0,0)' }],
     },
     'warm-glow-center': {
       type: 'radial',
-      coords: { r1: 0, r2: FRAME_W / 2, x1: FRAME_W / 2, y1: FRAME_H / 2, x2: FRAME_W / 2, y2: FRAME_H / 2 },
+      coords: { r1: 0, r2: 0.5, x1: 0.5, y1: 0.5, x2: 0.5, y2: 0.5 },
       colorStops: [{ offset: 0, color: 'rgba(255,200,100,0.8)' }, { offset: 0.7, color: 'rgba(255,200,100,0)' }],
     },
     'light-fade-bottom': {
-      type: 'linear', coords: { x1: 0, y1: FRAME_H, x2: 0, y2: 0 },
+      type: 'linear', coords: { x1: 0, y1: 1, x2: 0, y2: 0 },
       colorStops: [{ offset: 0, color: 'rgba(255,255,255,1)' }, { offset: 0.7, color: 'rgba(255,255,255,0)' }],
     },
   };
   const def = gradMap[overlayId];
-  return def ? new fabric.Gradient(def) : null;
+  return def ? new fabric.Gradient({ ...def, gradientUnits: 'percentage' }) : null;
 }
 
 // ─── Core renderer (shared between preview + export) ───────────────
@@ -79,7 +79,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
             rx: 500 * scaleMult, ry: 500 * scaleMult,
             absolutePositioned: true,
           }),
-          selectable: false, evented: false,
+          selectable: !tpl.hero.locked, evented: !tpl.hero.locked,
         });
       } else if (tpl.category === 'Editorial') {
         const scaleX = (FW * 0.5) / img.width;
@@ -95,7 +95,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
             left: FW * 0.5, top: 0, width: FW * 0.5, height: FH,
             absolutePositioned: true,
           }),
-          selectable: false, evented: false,
+          selectable: !tpl.hero.locked, evented: !tpl.hero.locked,
         });
       } else {
         const scaleX = FW / img.width;
@@ -107,7 +107,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
           top:  (tpl.hero.y / 100) * FH,
           scaleX: baseScale * tpl.hero.scale * (tpl.hero.mirror ? -1 : 1),
           scaleY: baseScale * tpl.hero.scale,
-          selectable: false, evented: false,
+          selectable: !tpl.hero.locked, evented: !tpl.hero.locked,
         });
       }
       canvas.add(img);
@@ -136,7 +136,7 @@ export async function renderTplToFabricCanvas(tpl, canvas, FW, FH, scaleMult = 1
     if (activeOverlay.type === 'solid') {
       fill = activeOverlay.css;
     } else {
-      fill = buildGradient(activeOverlay.id, FW, FH);
+      fill = buildGradient(activeOverlay.id);
     }
 
     if (fill) {
