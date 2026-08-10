@@ -151,9 +151,10 @@
 }
 
 .pv-frame {
-  width: 100%;
-  max-width: min(600px, 70vh * 0.8);
-  aspect-ratio: 4 / 5;
+  /* Calculate explicitly to avoid aspect-ratio flex bugs */
+  height: min(70vh, 750px);
+  width: calc(min(70vh, 750px) * 0.8);
+  max-width: 100%;
   background: #e6dfd1; /* Light brown / handmade paper color */
   position: relative;
   box-shadow: 0 24px 64px rgba(0,0,0,0.5);
